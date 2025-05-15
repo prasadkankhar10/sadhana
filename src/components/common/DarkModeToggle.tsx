@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 const DarkModeToggle: React.FC = () => {
-  const [dark, setDark] = useState(() =>
-    window.matchMedia('(prefers-color-scheme: dark)').matches
+  const [dark, setDark] = useState(
+    () => window.matchMedia('(prefers-color-scheme: dark)').matches,
   );
 
   useEffect(() => {
