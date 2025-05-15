@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 
-const Layout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const Layout: React.FC<React.PropsWithChildren<object>> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col bg-sky-50 dark:bg-gray-900 transition-colors">
       <Navbar />
