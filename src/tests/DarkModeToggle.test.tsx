@@ -1,4 +1,5 @@
 // Example test for DarkModeToggle
+import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import DarkModeToggle from '../components/common/DarkModeToggle';
 
