@@ -37,4 +37,4 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SADHANA }}'
           channelId: live
-          projectId: YOUR_PROJECT_ID
+          projectId: sadhana-prasad
