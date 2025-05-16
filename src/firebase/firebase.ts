@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: 'AIzaSyCbV3H_HhwK39sgj4A8UghvgK1W1TY1bpw',
   authDomain: 'sadhana-prasad.firebaseapp.com',
   projectId: 'sadhana-prasad',
-  storageBucket: 'sadhana-prasad.firebasestorage.app',
+  storageBucket: 'sadhana-prasad.appspot.com',
   messagingSenderId: '654502924214',
   appId: '1:654502924214:web:ba5a346ce6b75ab07abb17',
   measurementId: 'G-HR010HP0RC',
