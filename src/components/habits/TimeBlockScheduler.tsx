@@ -3,18 +3,14 @@ import TimeBlockCard, { TimeBlock } from './TimeBlockCard';
 import AddTimeBlockModal from './AddTimeBlockModal';
 import { db } from '../../firebase/firebase';
 import { useAuth } from '../../firebase/AuthProvider';
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-} from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 const TimeBlockScheduler: React.FC = () => {
   const { user } = useAuth();
   const [blocks, setBlocks] = useState<TimeBlock[]>([]);
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [selectedDate, setSelectedDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [editBlock, setEditBlock] = useState<TimeBlock | null>(null);
   const [loading, setLoading] = useState(false);
@@ -27,14 +23,18 @@ const TimeBlockScheduler: React.FC = () => {
     setLoading(true);
     setError(null);
     const docRef = doc(db, 'users', user.uid, 'schedule', selectedDate);
-    const unsub = onSnapshot(docRef, (snapshot) => {
-      const data = snapshot.data();
-      setBlocks(data?.blocks || []);
-      setLoading(false);
-    }, (err) => {
-      setError('Failed to load schedule.');
-      setLoading(false);
-    });
+    const unsub = onSnapshot(
+      docRef,
+      (snapshot) => {
+        const data = snapshot.data();
+        setBlocks(data?.blocks || []);
+        setLoading(false);
+      },
+      () => {
+        setError('Failed to load schedule.');
+        setLoading(false);
+      },
+    );
     return () => unsub();
   }, [user, selectedDate]);
 
@@ -49,7 +49,7 @@ const TimeBlockScheduler: React.FC = () => {
         date: selectedDate,
         blocks: newBlocks,
       });
-    } catch (e) {
+    } catch {
       setError('Failed to save schedule.');
     }
   };
@@ -62,7 +62,7 @@ const TimeBlockScheduler: React.FC = () => {
     };
     const newStart = toMinutes(newBlock.startTime);
     const newEnd = toMinutes(newBlock.endTime);
-    return blocks.some(b => {
+    return blocks.some((b) => {
       if (ignoreId && b.id === ignoreId) return false;
       const bStart = toMinutes(b.startTime);
       const bEnd = toMinutes(b.endTime);
@@ -87,19 +87,21 @@ const TimeBlockScheduler: React.FC = () => {
       setOverlapError('Block overlaps with another.');
       return;
     }
-    const newBlocks = blocks.map(x => x.id === block.id ? block : x);
+    const newBlocks = blocks.map((x) => (x.id === block.id ? block : x));
     setBlocks(newBlocks);
     await saveBlocks(newBlocks);
   };
   const handleDelete = async (id: string) => {
     setOverlapError(null);
-    const newBlocks = blocks.filter(x => x.id !== id);
+    const newBlocks = blocks.filter((x) => x.id !== id);
     setBlocks(newBlocks);
     await saveBlocks(newBlocks);
   };
   const handleToggleComplete = async (id: string) => {
     setOverlapError(null);
-    const newBlocks = blocks.map(x => x.id === id ? { ...x, completed: !x.completed } : x);
+    const newBlocks = blocks.map((x) =>
+      x.id === id ? { ...x, completed: !x.completed } : x,
+    );
     setBlocks(newBlocks);
     await saveBlocks(newBlocks);
   };
@@ -111,8 +113,9 @@ const TimeBlockScheduler: React.FC = () => {
   };
 
   // Progress bar calculation
-  const completedCount = blocks.filter(b => b.completed).length;
-  const progress = blocks.length > 0 ? Math.round((completedCount / blocks.length) * 100) : 0;
+  const completedCount = blocks.filter((b) => b.completed).length;
+  const progress =
+    blocks.length > 0 ? Math.round((completedCount / blocks.length) * 100) : 0;
 
   // Current time marker (in minutes since 00:00)
   const now = new Date();
@@ -126,13 +129,16 @@ const TimeBlockScheduler: React.FC = () => {
           <input
             type="date"
             value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
+            onChange={(e) => setSelectedDate(e.target.value)}
             className="rounded px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none"
           />
         </div>
         <button
           className="px-3 py-2 rounded bg-sky-400 hover:bg-sky-500 text-white text-xs font-semibold"
-          onClick={() => { setEditBlock(null); setModalOpen(true); }}
+          onClick={() => {
+            setEditBlock(null);
+            setModalOpen(true);
+          }}
         >
           ➕ Add Block
         </button>
@@ -140,8 +146,12 @@ const TimeBlockScheduler: React.FC = () => {
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-1">
-          <span className="text-sm text-gray-700 dark:text-gray-200">Progress</span>
-          <span className="text-xs text-gray-500 dark:text-gray-300">{progress}%</span>
+          <span className="text-sm text-gray-700 dark:text-gray-200">
+            Progress
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-300">
+            {progress}%
+          </span>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
           <div
@@ -151,13 +161,19 @@ const TimeBlockScheduler: React.FC = () => {
         </div>
       </div>
       {loading && (
-        <div className="mb-4 text-center text-sky-500 dark:text-sky-300 font-semibold">Loading...</div>
+        <div className="mb-4 text-center text-sky-500 dark:text-sky-300 font-semibold">
+          Loading...
+        </div>
       )}
       {error && (
-        <div className="mb-4 text-center text-red-500 dark:text-red-400 font-semibold">{error}</div>
+        <div className="mb-4 text-center text-red-500 dark:text-red-400 font-semibold">
+          {error}
+        </div>
       )}
       {overlapError && (
-        <div className="mb-4 text-center text-red-500 dark:text-red-400 font-semibold">{overlapError}</div>
+        <div className="mb-4 text-center text-red-500 dark:text-red-400 font-semibold">
+          {overlapError}
+        </div>
       )}
       <div className="relative min-h-[600px] bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-y-auto">
         {/* Current time marker */}
@@ -168,7 +184,7 @@ const TimeBlockScheduler: React.FC = () => {
         {/* Time blocks */}
         {blocks
           .sort((a, b) => a.startTime.localeCompare(b.startTime))
-          .map(block => (
+          .map((block) => (
             <TimeBlockCard
               key={block.id}
               block={block}
@@ -178,14 +194,19 @@ const TimeBlockScheduler: React.FC = () => {
             />
           ))}
         {blocks.length === 0 && !loading && (
-          <div className="text-center text-gray-400 mt-8">No blocks for this day.</div>
+          <div className="text-center text-gray-400 mt-8">
+            No blocks for this day.
+          </div>
         )}
       </div>
       <AddTimeBlockModal
         open={modalOpen}
         initial={editBlock || {}}
         onSave={editBlock ? handleEdit : handleAdd}
-        onClose={() => { setModalOpen(false); setEditBlock(null); }}
+        onClose={() => {
+          setModalOpen(false);
+          setEditBlock(null);
+        }}
       />
     </div>
   );

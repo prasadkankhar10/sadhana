@@ -3,9 +3,9 @@ import React from 'react';
 export interface TimeBlock {
   id: string;
   startTime: string; // 'HH:mm'
-  endTime: string;   // 'HH:mm'
+  endTime: string; // 'HH:mm'
   title: string;
-  type: string;      // e.g., 'routine', 'study'
+  type: string; // e.g., 'routine', 'study'
   completed: boolean;
   color: string;
   icon: string;
@@ -20,7 +20,12 @@ interface TimeBlockCardProps {
   onToggleComplete: (id: string) => void;
 }
 
-const TimeBlockCard: React.FC<TimeBlockCardProps> = ({ block, onEdit, onDelete, onToggleComplete }) => {
+const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
+  block,
+  onEdit,
+  onDelete,
+  onToggleComplete,
+}) => {
   return (
     <div
       className="flex items-center gap-2 p-2 rounded-lg shadow mb-2"
