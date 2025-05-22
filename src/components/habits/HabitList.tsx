@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase/firebase';
 import { useAuth } from '../../firebase/AuthProvider';
+import { useCheatMenu } from '../../App';
 import {
   collection,
   doc,
@@ -28,15 +29,17 @@ interface Reminder {
   vibrate: boolean;
 }
 
-const getToday = () => new Date().toISOString().slice(0, 10);
+// --- App Date Override for Testing ---
+interface HabitListProps {
+  appDate: string | null;
+  setAppDate: (date: string) => void;
+}
 
-const HabitList: React.FC = () => {
+const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
+  const cheatMenu = useCheatMenu();
   const { user } = useAuth();
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [reminders, setReminders] = useState<Reminder[]>([]);
   const [newHabit, setNewHabit] = useState('');
   const [showHistory, setShowHistory] = useState<number | null>(null);
-  // Add reminderForm state for new reminder input
   const [reminderForm, setReminderForm] = useState({
     hour: 20,
     minute: 0,
@@ -45,10 +48,15 @@ const HabitList: React.FC = () => {
     vibrate: false,
   });
 
+  // Use cheatMenu.habits as the source of truth for habits
+  const habits = cheatMenu.habits;
+  const reminders = cheatMenu.reminders;
+
   // Update add/edit/delete logic to sync with Firestore
   const addHabit = async () => {
-    if (newHabit.trim()) {
-      const habit: Habit = {
+    // Add null check for user before using in Firestore calls
+    if (newHabit.trim() && user) {
+      const habit = {
         id: Date.now(),
         name: newHabit.trim(),
         doneToday: false,
@@ -56,7 +64,10 @@ const HabitList: React.FC = () => {
         lastCompleted: null,
         history: [],
       };
-      await saveHabitToFirestore(habit);
+      await setDoc(
+        doc(db, 'users', user.uid, 'habits', habit.id.toString()),
+        habit,
+      );
       setNewHabit('');
     }
   };
@@ -99,12 +110,6 @@ const HabitList: React.FC = () => {
       });
     }
   };
-
-  function getYesterday() {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    return d.toISOString().slice(0, 10);
-  }
 
   // Progress calculation
   const completedCount = habits.filter((h) => h.doneToday).length;
@@ -187,7 +192,8 @@ const HabitList: React.FC = () => {
 
   // Reminder management handlers (Firestore)
   const addReminder = async () => {
-    const reminder: Reminder = {
+    if (!user) return;
+    const reminder = {
       id: Date.now() + Math.floor(Math.random() * 10000),
       hour: reminderForm.hour,
       minute: reminderForm.minute,
@@ -195,7 +201,10 @@ const HabitList: React.FC = () => {
       sound: reminderForm.sound,
       vibrate: reminderForm.vibrate,
     };
-    await saveReminderToFirestore(reminder);
+    await setDoc(
+      doc(db, 'users', user.uid, 'reminders', reminder.id.toString()),
+      reminder,
+    );
     setReminderForm({
       hour: 20,
       minute: 0,
@@ -239,38 +248,13 @@ const HabitList: React.FC = () => {
     setError(null);
     // Listen for habits
     const habitsRef = collection(db, 'users', user.uid, 'habits');
-    const unsubHabits = onSnapshot(habitsRef, (snapshot) => {
-      setHabits(
-        snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: typeof doc.id === 'string' ? parseInt(doc.id) : doc.id,
-            name: data.name,
-            doneToday: data.doneToday,
-            streak: data.streak,
-            lastCompleted: data.lastCompleted,
-            history: data.history || [],
-          } as Habit;
-        }),
-      );
+    const unsubHabits = onSnapshot(habitsRef, () => {
       setLoading(false);
     });
     // Listen for reminders
     const remindersRef = collection(db, 'users', user.uid, 'reminders');
-    const unsubReminders = onSnapshot(remindersRef, (snapshot) => {
-      setReminders(
-        snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: typeof doc.id === 'string' ? parseInt(doc.id) : doc.id,
-            hour: data.hour,
-            minute: data.minute,
-            message: data.message,
-            sound: data.sound,
-            vibrate: data.vibrate,
-          } as Reminder;
-        }),
-      );
+    const unsubReminders = onSnapshot(remindersRef, () => {
+      // Only use reminders from context
     });
     return () => {
       unsubHabits();
@@ -309,57 +293,33 @@ const HabitList: React.FC = () => {
     await deleteDoc(docRef);
   };
 
-  // Developer cheat menu handlers
-  const onResetHabits = async () => {
-    for (const habit of habits) {
-      await saveHabitToFirestore({
-        ...habit,
-        doneToday: false,
-        streak: 0,
-        lastCompleted: null,
-        history: [],
-      });
-    }
-  };
-  const onMarkAllDone = async () => {
+  // --- Daily Reset Logic ---
+  useEffect(() => {
+    if (!user || habits.length === 0) return;
     const today = getToday();
-    for (const habit of habits) {
-      await saveHabitToFirestore({
-        ...habit,
-        doneToday: true,
-        streak: habit.streak + 1,
-        lastCompleted: today,
-        history: [...habit.history, today],
-      });
-    }
-  };
-  const onClearReminders = async () => {
-    for (const reminder of reminders) {
-      await deleteReminderFromFirestore(reminder.id);
-    }
-  };
-  const onAddTestHabit = async () => {
-    const habit: Habit = {
-      id: Date.now(),
-      name: 'Test Habit ' + Math.floor(Math.random() * 1000),
-      doneToday: false,
-      streak: 0,
-      lastCompleted: null,
-      history: [],
-    };
-    await saveHabitToFirestore(habit);
-  };
-  const onAddTestReminder = async () => {
-    const reminder: Reminder = {
-      id: Date.now() + Math.floor(Math.random() * 10000),
-      hour: 12,
-      minute: 0,
-      message: 'Test Reminder',
-      sound: true,
-      vibrate: true,
-    };
-    await saveReminderToFirestore(reminder);
-  };
+    // If any habit.doneToday is true but lastCompleted is not today, reset it
+    habits.forEach((habit) => {
+      if (habit.doneToday && habit.lastCompleted !== today) {
+        saveHabitToFirestore({
+          ...habit,
+          doneToday: false,
+        });
+      }
+    });
+    // eslint-disable-next-line
+  }, [habits, user, appDate]);
+
+  // --- App Date Override for Testing ---
+  // getToday and getYesterday helpers (needed for logic)
+  const getToday = React.useCallback(
+    () => (appDate ? appDate : new Date().toISOString().slice(0, 10)),
+    [appDate],
+  );
+  const getYesterday = React.useCallback(() => {
+    const d = appDate ? new Date(appDate) : new Date();
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().slice(0, 10);
+  }, [appDate]);
 
   return (
     <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 mt-4 sm:mt-6 transition-all text-gray-900 dark:text-gray-100">
@@ -520,7 +480,10 @@ const HabitList: React.FC = () => {
             placeholder="Message"
             value={reminderForm.message}
             onChange={(e) =>
-              setReminderForm((f) => ({ ...f, message: e.target.value }))
+              setReminderForm((f) => ({
+                ...f,
+                message: String(e.target.value),
+              }))
             }
             className="rounded px-2 py-2 text-xs border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-400 transition flex-1 min-w-0"
           />
@@ -620,31 +583,26 @@ const HabitList: React.FC = () => {
         <HabitHistoryModal
           habit={habits.find((h) => h.id === showHistory)!}
           onClose={() => setShowHistory(null)}
+          appDate={appDate}
+          getToday={getToday}
         />
       )}
-      <DeveloperCheatMenu
-        habits={habits}
-        reminders={reminders}
-        onResetHabits={onResetHabits}
-        onMarkAllDone={onMarkAllDone}
-        onClearReminders={onClearReminders}
-        onAddTestHabit={onAddTestHabit}
-        onAddTestReminder={onAddTestReminder}
-      />
     </div>
   );
 };
 
 // Calendar/History Modal
-const HabitHistoryModal: React.FC<{ habit: Habit; onClose: () => void }> = ({
-  habit,
-  onClose,
-}) => {
+const HabitHistoryModal: React.FC<{
+  habit: Habit;
+  onClose: () => void;
+  appDate?: string | null;
+  getToday?: () => string;
+}> = ({ habit, onClose, appDate, getToday }) => {
   // Build a set of completed dates for quick lookup
   const completedSet = new Set(habit.history);
   // Show the last 30 days
   const days = Array.from({ length: 30 }, (_, i) => {
-    const d = new Date();
+    const d = appDate ? new Date(appDate) : new Date();
     d.setDate(d.getDate() - (29 - i));
     return d;
   });
@@ -664,7 +622,7 @@ const HabitHistoryModal: React.FC<{ habit: Habit; onClose: () => void }> = ({
         <div className="grid grid-cols-7 gap-2">
           {days.map((date) => {
             const iso = date.toISOString().slice(0, 10);
-            const isToday = iso === getToday();
+            const isToday = getToday ? iso === getToday() : false;
             return (
               <div
                 key={iso}
@@ -687,82 +645,6 @@ const HabitHistoryModal: React.FC<{ habit: Habit; onClose: () => void }> = ({
           Green = completed, Gray = not completed, Blue ring = today
         </div>
       </div>
-    </div>
-  );
-};
-
-// DeveloperCheatMenu component for quick testing/dev tools
-const DeveloperCheatMenu: React.FC<{
-  habits: Habit[];
-  reminders: Reminder[];
-  onResetHabits: () => void;
-  onMarkAllDone: () => void;
-  onClearReminders: () => void;
-  onAddTestHabit: () => void;
-  onAddTestReminder: () => void;
-}> = ({
-  habits,
-  reminders,
-  onResetHabits,
-  onMarkAllDone,
-  onClearReminders,
-  onAddTestHabit,
-  onAddTestReminder,
-}) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-full">
-      <button
-        className="bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-sky-500 transition"
-        onClick={() => setOpen((o) => !o)}
-        title="Developer Cheat Menu"
-      >
-        🛠️
-      </button>
-      {open && (
-        <div className="mt-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-72 max-w-xs border border-gray-300 dark:border-gray-700">
-          <div className="font-bold mb-2 text-sky-600 dark:text-sky-300">
-            Developer Cheat Menu
-          </div>
-          <div className="mb-2 text-xs text-gray-500">
-            Quick test/dev actions
-          </div>
-          <button
-            className="w-full mb-1 px-2 py-1 rounded bg-sky-400 hover:bg-sky-500 text-white text-xs font-semibold"
-            onClick={onResetHabits}
-          >
-            Reset All Habits
-          </button>
-          <button
-            className="w-full mb-1 px-2 py-1 rounded bg-green-400 hover:bg-green-500 text-white text-xs font-semibold"
-            onClick={onMarkAllDone}
-          >
-            Mark All Done
-          </button>
-          <button
-            className="w-full mb-1 px-2 py-1 rounded bg-indigo-400 hover:bg-indigo-500 text-white text-xs font-semibold"
-            onClick={onAddTestHabit}
-          >
-            Add Test Habit
-          </button>
-          <button
-            className="w-full mb-1 px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs font-semibold"
-            onClick={onAddTestReminder}
-          >
-            Add Test Reminder
-          </button>
-          <button
-            className="w-full mb-1 px-2 py-1 rounded bg-red-400 hover:bg-red-500 text-white text-xs font-semibold"
-            onClick={onClearReminders}
-          >
-            Clear All Reminders
-          </button>
-          <div className="mt-2 text-xs text-gray-700 dark:text-gray-300">
-            <div>Habits: {habits.length}</div>
-            <div>Reminders: {reminders.length}</div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
