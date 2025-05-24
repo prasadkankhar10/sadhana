@@ -179,6 +179,29 @@ function SadhanaApp() {
       reminder,
     );
   };
+  const onDeleteAllData = async () => {
+    if (!user) return;
+    const confirmed = window.confirm(
+      'Are you absolutely sure you want to delete ALL your data? This cannot be undone! Type DELETE in the next prompt to confirm.',
+    );
+    if (!confirmed) return;
+    const doubleCheck = window.prompt(
+      'Type DELETE to confirm you want to erase all your data. This action is irreversible.',
+    );
+    if (doubleCheck !== 'DELETE') {
+      alert('Data deletion cancelled.');
+      return;
+    }
+    // Delete all habits
+    for (const habit of habits) {
+      await deleteDoc(doc(db, 'users', user.uid, 'habits', habit.id.toString()));
+    }
+    // Delete all reminders
+    for (const reminder of reminders) {
+      await deleteDoc(doc(db, 'users', user.uid, 'reminders', reminder.id.toString()));
+    }
+    alert('All your data has been deleted. The app is now reset.');
+  };
 
   return (
     <CheatMenuContext.Provider
@@ -234,6 +257,7 @@ function SadhanaApp() {
           onAddTestReminder={onAddTestReminder}
           appDate={appDate}
           setAppDate={setAppDate}
+          onDeleteAllData={onDeleteAllData}
         />
       </Layout>
     </CheatMenuContext.Provider>

@@ -10,6 +10,7 @@ interface DeveloperCheatMenuProps {
   onAddTestReminder: () => void;
   appDate: string | null;
   setAppDate: (date: string) => void;
+  onDeleteAllData?: () => void;
 }
 
 const DeveloperCheatMenu: React.FC<DeveloperCheatMenuProps> = ({
@@ -22,6 +23,7 @@ const DeveloperCheatMenu: React.FC<DeveloperCheatMenuProps> = ({
   onAddTestReminder,
   appDate,
   setAppDate,
+  onDeleteAllData,
 }) => {
   const [open, setOpen] = useState(false);
   const [dateInput, setDateInput] = useState(
@@ -73,6 +75,15 @@ const DeveloperCheatMenu: React.FC<DeveloperCheatMenuProps> = ({
             onClick={onClearReminders}
           >
             Clear All Reminders
+          </button>
+          <button
+            className="w-full mb-1 px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-bold border-2 border-red-800 shadow"
+            onClick={onDeleteAllData}
+            style={{ marginTop: 8 }}
+            disabled={!onDeleteAllData}
+            title="Delete ALL data (irreversible)"
+          >
+            Delete ALL Data
           </button>
           <div className="mt-2 text-xs text-gray-700 dark:text-gray-300">
             <div>Habits: {habitsCount}</div>
