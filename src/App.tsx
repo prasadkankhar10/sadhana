@@ -116,7 +116,7 @@ function SadhanaApp() {
   const remindersCount = reminders.length;
 
   // --- Cheat menu handlers ---
-  const onResetHabits = async () => {
+  const onResetHabits = async (): Promise<void> => {
     if (!user) return;
     for (const habit of habits) {
       await setDoc(doc(db, 'users', user.uid, 'habits', habit.id.toString()), {
@@ -128,7 +128,7 @@ function SadhanaApp() {
       });
     }
   };
-  const onMarkAllDone = async () => {
+  const onMarkAllDone = async (): Promise<void> => {
     if (!user) return;
     const today = appDate || new Date().toISOString().slice(0, 10);
     for (const habit of habits) {
@@ -141,7 +141,7 @@ function SadhanaApp() {
       });
     }
   };
-  const onClearReminders = async () => {
+  const onClearReminders = async (): Promise<void> => {
     if (!user) return;
     for (const reminder of reminders) {
       await deleteDoc(
@@ -149,7 +149,7 @@ function SadhanaApp() {
       );
     }
   };
-  const onAddTestHabit = async () => {
+  const onAddTestHabit = async (): Promise<void> => {
     if (!user) return;
     const habit: Habit = {
       id: Date.now(),
@@ -164,7 +164,7 @@ function SadhanaApp() {
       habit,
     );
   };
-  const onAddTestReminder = async () => {
+  const onAddTestReminder = async (): Promise<void> => {
     if (!user) return;
     const reminder: Reminder = {
       id: Date.now() + Math.floor(Math.random() * 10000),
@@ -179,7 +179,7 @@ function SadhanaApp() {
       reminder,
     );
   };
-  const onDeleteAllData = async () => {
+  const onDeleteAllData = async (): Promise<void> => {
     if (!user) return;
     const confirmed = window.confirm(
       'Are you absolutely sure you want to delete ALL your data? This cannot be undone! Type DELETE in the next prompt to confirm.',
@@ -194,11 +194,15 @@ function SadhanaApp() {
     }
     // Delete all habits
     for (const habit of habits) {
-      await deleteDoc(doc(db, 'users', user.uid, 'habits', habit.id.toString()));
+      await deleteDoc(
+        doc(db, 'users', user.uid, 'habits', habit.id.toString()),
+      );
     }
     // Delete all reminders
     for (const reminder of reminders) {
-      await deleteDoc(doc(db, 'users', user.uid, 'reminders', reminder.id.toString()));
+      await deleteDoc(
+        doc(db, 'users', user.uid, 'reminders', reminder.id.toString()),
+      );
     }
     alert('All your data has been deleted. The app is now reset.');
   };

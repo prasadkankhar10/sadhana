@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 interface DeveloperCheatMenuProps {
   habitsCount: number;
   remindersCount: number;
-  onResetHabits: () => void;
-  onMarkAllDone: () => void;
-  onClearReminders: () => void;
-  onAddTestHabit: () => void;
-  onAddTestReminder: () => void;
+  onResetHabits: () => Promise<void>;
+  onMarkAllDone: () => Promise<void>;
+  onClearReminders: () => Promise<void>;
+  onAddTestHabit: () => Promise<void>;
+  onAddTestReminder: () => Promise<void>;
   appDate: string | null;
   setAppDate: (date: string) => void;
-  onDeleteAllData?: () => void;
+  onDeleteAllData?: () => Promise<void>;
 }
 
 const DeveloperCheatMenu: React.FC<DeveloperCheatMenuProps> = ({
