@@ -224,54 +224,84 @@ function SadhanaApp() {
         setAppDate,
       }}
     >
-      <Layout>
-        <div className="w-full max-w-2xl mx-auto">
-          <div className="flex justify-center gap-4 mb-6 mt-2">
-            <button
-              className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'habits' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-              onClick={() => setTab('habits')}
-            >
-              Habits
-            </button>
-            <button
-              className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'schedule' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-              onClick={() => setTab('schedule')}
-            >
-              Time-blocks
-            </button>
-            <button
-              className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'analytics' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-              onClick={() => setTab('analytics')}
-            >
-              Analytics
-            </button>
-            <button
-              className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'journal' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-              onClick={() => setTab('journal')}
-            >
-              Journal
-            </button>
+      <div
+        className="min-h-screen bg-[#fdf6e3] dark:bg-[#23272e] font-hand animate-fade-in-down"
+        style={{
+          background:
+            'repeating-linear-gradient(0deg, var(--journal-bg, #fdf6e3) 0px, var(--journal-bg, #fdf6e3) 31px, var(--journal-line, #e0d7c3) 32px, var(--journal-bg, #fdf6e3) 33px)',
+          fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive',
+          minHeight: '100vh',
+        }}
+      >
+        <style>{`
+          :root {
+            --journal-bg: #fdf6e3;
+            --journal-line: #e0d7c3;
+          }
+          .dark :root, .dark body {
+            --journal-bg: #23272e;
+            --journal-line: #3b4252;
+          }
+          @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+          @keyframes fade-in-down { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: translateY(0); } }
+          @keyframes fade-in-slow { from { opacity: 0; } to { opacity: 1; } }
+          @keyframes pop-in { 0% { transform: scale(0.7); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+          @keyframes wiggle { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+          .animate-fade-in { animation: fade-in 0.7s ease; }
+          .animate-fade-in-down { animation: fade-in-down 0.7s cubic-bezier(.4,2,.6,1); }
+          .animate-fade-in-slow { animation: fade-in-slow 1.2s ease; }
+          .animate-pop-in { animation: pop-in 0.5s cubic-bezier(.4,2,.6,1); }
+          .animate-wiggle { animation: wiggle 1.2s infinite alternate; }
+        `}</style>
+        <Layout>
+          <div className="w-full max-w-2xl mx-auto">
+            <div className="flex justify-center gap-4 mb-6 mt-2">
+              <button
+                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'habits' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+                onClick={() => setTab('habits')}
+              >
+                Habits
+              </button>
+              <button
+                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'schedule' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+                onClick={() => setTab('schedule')}
+              >
+                Time-blocks
+              </button>
+              <button
+                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'analytics' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+                onClick={() => setTab('analytics')}
+              >
+                Analytics
+              </button>
+              <button
+                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'journal' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+                onClick={() => setTab('journal')}
+              >
+                Journal
+              </button>
+            </div>
+            {tab === 'habits' && (
+              <HabitList appDate={appDate} setAppDate={setAppDate} />
+            )}
+            {tab === 'schedule' && <TimeBlockScheduler />}
+            {tab === 'analytics' && <HabitAnalytics />}
+            {tab === 'journal' && <DailyJournal appDate={appDate} />}
           </div>
-          {tab === 'habits' && (
-            <HabitList appDate={appDate} setAppDate={setAppDate} />
-          )}
-          {tab === 'schedule' && <TimeBlockScheduler />}
-          {tab === 'analytics' && <HabitAnalytics />}
-          {tab === 'journal' && <DailyJournal appDate={appDate} />}
-        </div>
-        <DeveloperCheatMenu
-          habitsCount={habitsCount}
-          remindersCount={remindersCount}
-          onResetHabits={onResetHabits}
-          onMarkAllDone={onMarkAllDone}
-          onClearReminders={onClearReminders}
-          onAddTestHabit={onAddTestHabit}
-          onAddTestReminder={onAddTestReminder}
-          appDate={appDate}
-          setAppDate={setAppDate}
-          onDeleteAllData={onDeleteAllData}
-        />
-      </Layout>
+          <DeveloperCheatMenu
+            habitsCount={habitsCount}
+            remindersCount={remindersCount}
+            onResetHabits={onResetHabits}
+            onMarkAllDone={onMarkAllDone}
+            onClearReminders={onClearReminders}
+            onAddTestHabit={onAddTestHabit}
+            onAddTestReminder={onAddTestReminder}
+            appDate={appDate}
+            setAppDate={setAppDate}
+            onDeleteAllData={onDeleteAllData}
+          />
+        </Layout>
+      </div>
     </CheatMenuContext.Provider>
   );
 }

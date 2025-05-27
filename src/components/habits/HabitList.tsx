@@ -9,6 +9,7 @@ import {
   deleteDoc,
   onSnapshot,
 } from 'firebase/firestore';
+import { RoughNotation } from 'react-rough-notation';
 
 interface Habit {
   id: number;
@@ -321,264 +322,278 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
     return d.toISOString().slice(0, 10);
   }, [appDate]);
 
+  const paperBg = {
+    backgroundImage:
+      'repeating-linear-gradient(0deg, var(--journal-bg, #fdf6e3) 0px, var(--journal-bg, #fdf6e3) 31px, var(--journal-line, #e0d7c3) 32px, var(--journal-bg, #fdf6e3) 33px)',
+    backgroundColor: 'var(--journal-bg, #fdf6e3)',
+  };
+  const handDrawnBorder = {
+    border: '3px solid #222',
+    borderRadius: '32px',
+    boxShadow: '0 6px 32px 0 rgba(60,40,10,0.10), 0 0 0 6px #f5e9c6',
+  };
+
   return (
-    <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 mt-4 sm:mt-6 transition-all text-gray-900 dark:text-gray-100">
-      {/* Loading and error states */}
-      {loading && (
-        <div className="mb-4 text-center text-sky-500 dark:text-sky-300 font-semibold">
-          Loading...
-        </div>
-      )}
-      {error && (
-        <div className="mb-4 text-center text-red-500 dark:text-red-400 font-semibold">
-          {error}
-        </div>
-      )}
-      {/* Motivational Quote */}
-      <div className="mb-4 text-center">
-        <span className="italic text-sky-600 dark:text-sky-300 text-sm">
-          {quoteOfTheDay}
+    <div
+      className="relative max-w-3xl mx-auto mt-8 p-4 md:p-10 overflow-hidden"
+      style={{
+        ...paperBg,
+        ...handDrawnBorder,
+        fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive',
+        position: 'relative',
+      }}
+    >
+      {/* CSS Vars for light/dark mode */}
+      <style>{`
+        :root {
+          --journal-bg: #fdf6e3;
+          --journal-line: #e0d7c3;
+          --journal-hole-bg: #e0d7c3;
+          --journal-hole-border: #b7a77a;
+        }
+        .dark :root, .dark body {
+          --journal-bg: #23272e;
+          --journal-line: #3b4252;
+          --journal-hole-bg: #3b4252;
+          --journal-hole-border: #6b7280;
+        }
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes fade-in-down {
+          from { opacity: 0; transform: translateY(-24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-in-slow {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes pop-in {
+          0% { transform: scale(0.7); opacity: 0; }
+          80% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+        @keyframes wiggle {
+          0%, 100% { transform: rotate(-2deg); }
+          50% { transform: rotate(2deg); }
+        }
+        @keyframes progress {
+          from { width: 0; }
+          to { width: var(--tw-progress, 100%); }
+        }
+        .animate-fade-in { animation: fade-in 0.7s ease; }
+        .animate-fade-in-down { animation: fade-in-down 0.7s cubic-bezier(.4,2,.6,1); }
+        .animate-fade-in-slow { animation: fade-in-slow 1.2s ease; }
+        .animate-pop-in { animation: pop-in 0.5s cubic-bezier(.4,2,.6,1); }
+        .animate-wiggle { animation: wiggle 1.2s infinite alternate; }
+        .animate-progress { animation: progress 1.2s cubic-bezier(.4,2,.6,1); }
+      `}</style>
+      {/* Notebook holes */}
+      <div className="absolute left-0 top-8 flex flex-col gap-8 h-[90%] z-10">
+        {[...Array(6)].map((_, i) => (
+          <span
+            key={i}
+            className="w-4 h-4 rounded-full shadow-inner block ml-[-28px]"
+            style={{
+              background: 'var(--journal-hole-bg, #e0d7c3)',
+              border: '2px solid var(--journal-hole-border, #b7a77a)',
+            }}
+          />
+        ))}
+      </div>
+      {/* Animated Title */}
+      <div className="flex items-center justify-center gap-2 mb-4 animate-fade-in-down">
+        <span className="text-3xl md:text-4xl font-extrabold text-sky-700 dark:text-sky-300 tracking-tight drop-shadow-xl uppercase select-none flex items-center gap-2 font-hand animate-wiggle">
+          <RoughNotation
+            type="underline"
+            show
+            color="#f59e42"
+            animationDuration={1200}
+            padding={6}
+            strokeWidth={3}
+          >
+            <span>📝 Your Habits</span>
+          </RoughNotation>
         </span>
+        <span className="text-2xl md:text-3xl select-none animate-bounce">🌱</span>
+      </div>
+      {/* Micro-instructions */}
+      <div className="mb-2 text-center text-xs text-gray-500 dark:text-gray-300 font-hand animate-fade-in">
+        <span>Tip: Click a habit name to edit. Mark as done to keep your streak! <span className="ml-1">✨</span></span>
+      </div>
+      {/* Motivational Quote */}
+      <div className="mb-4 text-center italic text-sky-600 dark:text-sky-300 text-base font-hand animate-fade-in-slow">
+        <RoughNotation
+          type="highlight"
+          show
+          color="#fffbe6"
+          animationDuration={900}
+          padding={4}
+          strokeWidth={2}
+        >
+          {quoteOfTheDay}
+        </RoughNotation>
       </div>
       {/* Perfect Day Badge */}
       {perfectDay && (
-        <div className="mb-4 flex justify-center">
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-500 text-white text-xs font-bold shadow">
+        <div className="mb-4 flex justify-center animate-pop-in">
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-400 text-white text-xs font-bold shadow font-hand animate-wiggle">
             🌟 Perfect Day! All habits completed! 🌟
           </span>
         </div>
       )}
-      <h2 className="text-2xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">
-        Your Habits
-      </h2>
       {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-sm text-gray-700 dark:text-gray-200">
+      <div className="mb-6 animate-fade-in">
+        <div className="flex justify-between items-center mb-1 font-hand">
+          <span className="text-base text-gray-700 dark:text-gray-200">
             Progress
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-300">
             {progress}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+        <div
+          className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 border-2 border-dashed border-sky-300 shadow-inner"
+          style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
+        >
           <div
-            className="bg-sky-400 h-2.5 rounded-full transition-all"
+            className="bg-sky-400 h-3 rounded-full transition-all font-hand animate-progress"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
       </div>
       {/* Filter Buttons */}
-      <div className="flex flex-wrap justify-center gap-2 mb-4">
+      <div className="flex flex-wrap justify-center gap-2 mb-6 font-hand animate-fade-in">
         <button
-          className={`px-2 py-1 rounded text-xs font-semibold ${filter === 'all' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+          className={`px-3 py-1 rounded-full border-2 border-dashed text-xs font-bold shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-sky-400 font-hand ${
+            filter === 'all'
+              ? 'bg-sky-200 text-sky-900 border-sky-700 scale-110 ring-2 ring-sky-400'
+              : 'bg-[#fffbe6] text-gray-900 border-sky-300 hover:bg-sky-100'
+          }`}
           onClick={() => setFilter('all')}
         >
           All
         </button>
         <button
-          className={`px-2 py-1 rounded text-xs font-semibold ${filter === 'completed' ? 'bg-green-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+          className={`px-3 py-1 rounded-full border-2 border-dashed text-xs font-bold shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-green-400 font-hand ${
+            filter === 'completed'
+              ? 'bg-green-200 text-green-900 border-green-700 scale-110 ring-2 ring-green-400'
+              : 'bg-[#fffbe6] text-gray-900 border-green-300 hover:bg-green-100'
+          }`}
           onClick={() => setFilter('completed')}
         >
           Completed
         </button>
         <button
-          className={`px-2 py-1 rounded text-xs font-semibold ${filter === 'incomplete' ? 'bg-red-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+          className={`px-3 py-1 rounded-full border-2 border-dashed text-xs font-bold shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-400 font-hand ${
+            filter === 'incomplete'
+              ? 'bg-red-200 text-red-900 border-red-700 scale-110 ring-2 ring-red-400'
+              : 'bg-[#fffbe6] text-gray-900 border-red-300 hover:bg-red-100'
+          }`}
           onClick={() => setFilter('incomplete')}
         >
           Incomplete
         </button>
       </div>
-      <div className="flex flex-col sm:flex-row mb-4 gap-2">
+      {/* Add Habit Input */}
+      <div className="flex flex-col sm:flex-row mb-6 gap-2 font-hand animate-fade-in">
         <input
-          className="flex-1 rounded-l sm:rounded-l px-3 py-2 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none min-w-0"
+          className="flex-1 rounded-l-xl px-3 py-2 border-2 border-dashed border-sky-400 bg-[#fffbe6] text-gray-900 font-hand focus:outline-none focus:ring-2 focus:ring-sky-400 transition min-w-0 shadow-md font-semibold"
           type="text"
           placeholder="Add a new habit..."
           value={newHabit}
           onChange={(e) => setNewHabit(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addHabit()}
+          style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
         />
         <button
-          className="rounded-r sm:rounded-r bg-sky-400 hover:bg-sky-500 text-white px-4 py-2 font-semibold w-full sm:w-auto"
+          className="rounded-r-xl bg-sky-400 hover:bg-sky-500 text-white px-4 py-2 font-bold w-full sm:w-auto shadow font-hand border-2 border-dashed border-sky-400"
           onClick={addHabit}
         >
-          Add
+          ➕ Add
         </button>
       </div>
-      {/* Reminders Management */}
-      <div className="mb-4">
-        <h3 className="text-sm font-bold mb-2 text-center">Reminders</h3>
-        <ul className="mb-2">
-          {reminders.map((reminder) => (
-            <li
-              key={reminder.id}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-1"
-            >
-              <input
-                type="time"
-                value={`${reminder.hour.toString().padStart(2, '0')}:${reminder.minute.toString().padStart(2, '0')}`}
-                onChange={(e) => {
-                  const [h, m] = e.target.value.split(':').map(Number);
-                  updateReminder(reminder.id, { hour: h, minute: m });
-                }}
-                className="rounded px-2 py-1 text-xs border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none w-full sm:w-20"
-              />
-              <input
-                type="text"
-                placeholder="Message"
-                value={reminder.message}
-                onChange={(e) =>
-                  updateReminder(reminder.id, { message: e.target.value })
-                }
-                className="rounded px-2 py-1 text-xs border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none flex-1 min-w-0"
-              />
-              <div className="flex gap-2">
-                <label className="flex items-center text-xs gap-1 text-gray-900 dark:text-gray-100">
-                  <input
-                    type="checkbox"
-                    checked={reminder.sound}
-                    onChange={(e) =>
-                      updateReminder(reminder.id, { sound: e.target.checked })
-                    }
-                  />
-                  Sound
-                </label>
-                <label className="flex items-center text-xs gap-1 text-gray-900 dark:text-gray-100">
-                  <input
-                    type="checkbox"
-                    checked={reminder.vibrate}
-                    onChange={(e) =>
-                      updateReminder(reminder.id, { vibrate: e.target.checked })
-                    }
-                  />
-                  Vibrate
-                </label>
-              </div>
-              <button
-                className="px-2 py-1 rounded bg-red-400 hover:bg-red-500 text-white text-xs font-semibold w-full md:w-auto"
-                onClick={() => deleteReminder(reminder.id)}
-                title="Delete reminder"
-              >
-                ×
-              </button>
-            </li>
-          ))}
-        </ul>
-        {/* Add new reminder form */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shadow-sm">
-          <input
-            type="time"
-            value={`${reminderForm.hour.toString().padStart(2, '0')}:${reminderForm.minute.toString().padStart(2, '0')}`}
-            onChange={(e) => {
-              const [h, m] = e.target.value.split(':').map(Number);
-              setReminderForm((f) => ({ ...f, hour: h, minute: m }));
-            }}
-            className="rounded px-2 py-2 text-xs border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-400 transition w-full sm:w-20"
-          />
-          <input
-            type="text"
-            placeholder="Message"
-            value={reminderForm.message}
-            onChange={(e) =>
-              setReminderForm((f) => ({
-                ...f,
-                message: String(e.target.value),
-              }))
-            }
-            className="rounded px-2 py-2 text-xs border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-400 transition flex-1 min-w-0"
-          />
-          <div className="flex gap-3 items-center px-1">
-            <label className="flex items-center text-xs gap-1 cursor-pointer select-none text-gray-900 dark:text-gray-100">
-              <input
-                type="checkbox"
-                checked={reminderForm.sound}
-                onChange={(e) =>
-                  setReminderForm((f) => ({ ...f, sound: e.target.checked }))
-                }
-                className="accent-sky-400 focus:ring-2 focus:ring-sky-400"
-              />
-              <span>Sound</span>
-            </label>
-            <label className="flex items-center text-xs gap-1 cursor-pointer select-none text-gray-900 dark:text-gray-100">
-              <input
-                type="checkbox"
-                checked={reminderForm.vibrate}
-                onChange={(e) =>
-                  setReminderForm((f) => ({ ...f, vibrate: e.target.checked }))
-                }
-                className="accent-sky-400 focus:ring-2 focus:ring-sky-400"
-              />
-              <span>Vibrate</span>
-            </label>
-          </div>
-          <button
-            className="px-3 py-2 rounded bg-sky-400 hover:bg-sky-500 focus:ring-2 focus:ring-sky-400 text-white text-xs font-semibold w-full sm:w-auto transition shadow"
-            onClick={addReminder}
-            title="Add reminder"
-          >
-            +
-          </button>
-        </div>
-      </div>
-      <ul>
+      {/* Habits List */}
+      <ul className="mb-8 animate-fade-in-slow">
         {filteredHabits.length === 0 && (
-          <li className="text-center text-gray-500 dark:text-gray-300">
+          <li className="text-center text-gray-500 dark:text-gray-300 font-hand">
             No habits to show.
           </li>
         )}
         {filteredHabits.map((habit) => (
           <li
             key={habit.id}
-            className="flex flex-col md:flex-row items-stretch md:items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0 gap-2 md:gap-0"
+            className="flex flex-col md:flex-row items-stretch md:items-center justify-between py-3 border-b-2 border-dashed border-sky-100 last:border-b-0 gap-2 md:gap-0 font-hand bg-[#fffbe6] rounded-xl mb-2 shadow-md"
+            style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
           >
             <span
               className={
                 habit.doneToday
-                  ? 'line-through text-gray-400 dark:text-gray-400'
-                  : 'text-gray-900 dark:text-gray-100'
+                  ? 'line-through text-gray-400 dark:text-gray-400 font-hand'
+                  : 'text-gray-900 dark:text-gray-100 font-hand'
               }
             >
               <input
-                className="bg-transparent border-none outline-none font-semibold text-base w-auto max-w-xs dark:bg-transparent"
+                className="bg-transparent border-none outline-none font-semibold text-base w-auto max-w-xs dark:bg-transparent font-hand"
                 value={habit.name}
                 onChange={(e) => editHabit(habit.id, e.target.value)}
                 disabled={habit.doneToday}
                 aria-label="Edit habit name"
               />
-              <span className="ml-2 text-xs text-sky-500 dark:text-sky-300 font-semibold">
-                Streak: {habit.streak}
+              <span className="ml-2 text-xs text-sky-500 dark:text-sky-300 font-semibold font-hand">
+                🔥 Streak: {habit.streak}
               </span>
             </span>
             <div className="flex flex-wrap gap-2 md:gap-2 items-center justify-end">
               <button
-                className={`px-3 py-1 rounded font-semibold transition-colors w-full md:w-auto ${
+                className={`px-3 py-1 rounded-xl border-2 border-dashed font-bold transition-colors w-full md:w-auto font-hand shadow ${
                   habit.doneToday
-                    ? 'bg-green-400 text-white cursor-not-allowed opacity-60'
-                    : 'bg-gray-200 hover:bg-sky-400 hover:text-white dark:bg-gray-700 dark:hover:bg-sky-500 dark:text-gray-100'
+                    ? 'bg-green-400 text-white cursor-not-allowed opacity-60 border-green-700'
+                    : 'bg-[#fffbe6] text-gray-900 border-sky-300 hover:bg-sky-100 border-sky-400'
                 }`}
                 onClick={() => toggleHabit(habit.id)}
                 disabled={habit.doneToday}
               >
-                {habit.doneToday ? 'Done!' : 'Mark as Done'}
+                {habit.doneToday ? '✅ Done!' : 'Mark as Done'}
               </button>
               <button
-                className="px-2 py-1 rounded bg-red-400 hover:bg-red-500 text-white text-xs font-semibold w-full md:w-auto"
+                className="px-2 py-1 rounded-xl bg-red-400 hover:bg-red-500 text-white text-xs font-bold w-full md:w-auto font-hand border-2 border-dashed border-red-400 shadow"
                 onClick={() => deleteHabit(habit.id)}
                 title="Delete habit"
               >
-                Delete
+                🗑️
               </button>
               <button
-                className="px-2 py-1 rounded bg-indigo-400 hover:bg-indigo-500 text-white text-xs font-semibold w-full md:w-auto"
+                className="px-2 py-1 rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white text-xs font-bold w-full md:w-auto font-hand border-2 border-dashed border-indigo-400 shadow"
                 onClick={() => setShowHistory(habit.id)}
                 title="View history"
               >
-                History
+                📅
               </button>
             </div>
           </li>
         ))}
       </ul>
+      {/* Paper lines overlay for notebook effect */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 animate-fade-in"
+        aria-hidden="true"
+      >
+        {[...Array(18)].map((_, i) => (
+          <div
+            key={i}
+            className="w-full h-[1px]"
+            style={{
+              background: 'var(--journal-line, #e0d7c3)',
+              opacity: 0.6,
+              position: 'absolute',
+              top: `${(i + 1) * 32}px`,
+            }}
+          />
+        ))}
+      </div>
+      {/* Habit History Modal */}
       {showHistory !== null && (
         <HabitHistoryModal
           habit={habits.find((h) => h.id === showHistory)!}

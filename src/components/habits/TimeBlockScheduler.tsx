@@ -122,7 +122,50 @@ const TimeBlockScheduler: React.FC = () => {
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4">
+    <div
+      className="w-full max-w-2xl mx-auto p-4 relative animate-fade-in-down"
+      style={{
+        fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive',
+        background: 'repeating-linear-gradient(0deg, var(--journal-bg, #fdf6e3) 0px, var(--journal-bg, #fdf6e3) 31px, var(--journal-line, #e0d7c3) 32px, var(--journal-bg, #fdf6e3) 33px)',
+        border: '3px solid #222',
+        borderRadius: '32px',
+        boxShadow: '0 6px 32px 0 rgba(60,40,10,0.10), 0 0 0 6px #f5e9c6',
+        position: 'relative',
+      }}
+    >
+      <style>{`
+        :root {
+          --journal-bg: #fdf6e3;
+          --journal-line: #e0d7c3;
+        }
+        .dark :root, .dark body {
+          --journal-bg: #23272e;
+          --journal-line: #3b4252;
+        }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fade-in-down { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-in-slow { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pop-in { 0% { transform: scale(0.7); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+        @keyframes wiggle { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+        @keyframes progress { from { width: 0; } to { width: var(--tw-progress, 100%); } }
+        .animate-fade-in { animation: fade-in 0.7s ease; }
+        .animate-fade-in-down { animation: fade-in-down 0.7s cubic-bezier(.4,2,.6,1); }
+        .animate-fade-in-slow { animation: fade-in-slow 1.2s ease; }
+        .animate-pop-in { animation: pop-in 0.5s cubic-bezier(.4,2,.6,1); }
+        .animate-wiggle { animation: wiggle 1.2s infinite alternate; }
+        .animate-progress { animation: progress 1.2s cubic-bezier(.4,2,.6,1); }
+      `}</style>
+      {/* Animated Title */}
+      <div className="flex items-center justify-center gap-2 mb-4 animate-fade-in-down">
+        <span className="text-3xl md:text-4xl font-extrabold text-sky-700 dark:text-sky-300 tracking-tight drop-shadow-xl uppercase select-none flex items-center gap-2 font-hand animate-wiggle">
+          <span>⏰ Time Blocks</span>
+        </span>
+        <span className="text-2xl md:text-3xl select-none animate-bounce">📅</span>
+      </div>
+      {/* Micro-instructions */}
+      <div className="mb-2 text-center text-xs text-gray-500 dark:text-gray-300 font-hand animate-fade-in">
+        <span>Tip: Add, drag, or edit blocks to plan your day. Mark as done when finished! <span className="ml-1">🕒</span></span>
+      </div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold">🗓️</span>
@@ -144,20 +187,17 @@ const TimeBlockScheduler: React.FC = () => {
         </button>
       </div>
       {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-sm text-gray-700 dark:text-gray-200">
+      <div className="mb-4 animate-fade-in">
+        <div className="flex justify-between items-center mb-1 font-hand">
+          <span className="text-base text-gray-700 dark:text-gray-200">
             Progress
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-300">
             {progress}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-          <div
-            className="bg-sky-400 h-2.5 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          ></div>
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 border-2 border-dashed border-sky-300 shadow-inner" style={{ boxShadow: '2px 2px 0 #e0d7c3' }}>
+          <div className="bg-sky-400 h-3 rounded-full transition-all font-hand animate-progress" style={{ width: `${progress}%` }}></div>
         </div>
       </div>
       {loading && (
@@ -175,7 +215,7 @@ const TimeBlockScheduler: React.FC = () => {
           {overlapError}
         </div>
       )}
-      <div className="relative min-h-[600px] bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-y-auto">
+      <div className="relative min-h-[600px] bg-transparent rounded-lg p-4 overflow-y-auto animate-fade-in-slow">
         {/* Current time marker */}
         <div
           className="absolute left-0 right-0 h-0.5 bg-sky-500 animate-pulse"
@@ -194,7 +234,7 @@ const TimeBlockScheduler: React.FC = () => {
             />
           ))}
         {blocks.length === 0 && !loading && (
-          <div className="text-center text-gray-400 mt-8">
+          <div className="text-center text-gray-400 mt-8 font-hand animate-fade-in">
             No blocks for this day.
           </div>
         )}
