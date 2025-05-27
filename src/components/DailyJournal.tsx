@@ -60,11 +60,13 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
   const [loading, setLoading] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [saved, setSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [history, setHistory] = useState<{
-    date: string;
-    mood: string;
-    text: string;
-  }[]>([]);
+  const [history, setHistory] = useState<
+    {
+      date: string;
+      mood: string;
+      text: string;
+    }[]
+  >([]);
   const [search, setSearch] = useState('');
   const [showHistory, setShowHistory] = useState(false);
 
@@ -126,10 +128,11 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
     setTimeout(() => setSaved(false), 1500);
   };
 
-  const filteredHistory = history.filter((h) =>
-    h.text.toLowerCase().includes(search.toLowerCase()) ||
-    h.date.includes(search) ||
-    h.mood.toLowerCase().includes(search.toLowerCase())
+  const filteredHistory = history.filter(
+    (h) =>
+      h.text.toLowerCase().includes(search.toLowerCase()) ||
+      h.date.includes(search) ||
+      h.mood.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -165,7 +168,7 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
             className="w-4 h-4 rounded-full shadow-inner block ml-[-28px]"
             style={{
               background: 'var(--journal-hole-bg, #e0d7c3)',
-              border: '2px solid var(--journal-hole-border, #b7a77a)'
+              border: '2px solid var(--journal-hole-border, #b7a77a)',
             }}
           />
         ))}
@@ -203,7 +206,7 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
         </div>
         <button
           className="px-4 py-2 rounded-xl border-2 border-dashed border-sky-400 bg-[#fffbe6] hover:bg-[#fdf6e3] text-sky-700 font-bold shadow-lg transition w-full md:w-auto tracking-wide font-hand flex items-center gap-2"
-          onClick={() => setShowHistory(h => !h)}
+          onClick={() => setShowHistory((h) => !h)}
           type="button"
         >
           {showHistory ? 'Hide History' : 'Show History'} <span>📖</span>
