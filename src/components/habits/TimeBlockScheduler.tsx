@@ -126,7 +126,8 @@ const TimeBlockScheduler: React.FC = () => {
       className="w-full max-w-2xl mx-auto p-4 relative animate-fade-in-down"
       style={{
         fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive',
-        background: 'repeating-linear-gradient(0deg, var(--journal-bg, #fdf6e3) 0px, var(--journal-bg, #fdf6e3) 31px, var(--journal-line, #e0d7c3) 32px, var(--journal-bg, #fdf6e3) 33px)',
+        background:
+          'repeating-linear-gradient(0deg, var(--journal-bg, #fdf6e3) 0px, var(--journal-bg, #fdf6e3) 31px, var(--journal-line, #e0d7c3) 32px, var(--journal-bg, #fdf6e3) 33px)',
         border: '3px solid #222',
         borderRadius: '32px',
         boxShadow: '0 6px 32px 0 rgba(60,40,10,0.10), 0 0 0 6px #f5e9c6',
@@ -160,11 +161,16 @@ const TimeBlockScheduler: React.FC = () => {
         <span className="text-3xl md:text-4xl font-extrabold text-sky-700 dark:text-sky-300 tracking-tight drop-shadow-xl uppercase select-none flex items-center gap-2 font-hand animate-wiggle">
           <span>⏰ Time Blocks</span>
         </span>
-        <span className="text-2xl md:text-3xl select-none animate-bounce">📅</span>
+        <span className="text-2xl md:text-3xl select-none animate-bounce">
+          📅
+        </span>
       </div>
       {/* Micro-instructions */}
       <div className="mb-2 text-center text-xs text-gray-500 dark:text-gray-300 font-hand animate-fade-in">
-        <span>Tip: Add, drag, or edit blocks to plan your day. Mark as done when finished! <span className="ml-1">🕒</span></span>
+        <span>
+          Tip: Add, drag, or edit blocks to plan your day. Mark as done when
+          finished! <span className="ml-1">🕒</span>
+        </span>
       </div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -196,8 +202,14 @@ const TimeBlockScheduler: React.FC = () => {
             {progress}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 border-2 border-dashed border-sky-300 shadow-inner" style={{ boxShadow: '2px 2px 0 #e0d7c3' }}>
-          <div className="bg-sky-400 h-3 rounded-full transition-all font-hand animate-progress" style={{ width: `${progress}%` }}></div>
+        <div
+          className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 border-2 border-dashed border-sky-300 shadow-inner"
+          style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
+        >
+          <div
+            className="bg-sky-400 h-3 rounded-full transition-all font-hand animate-progress"
+            style={{ width: `${progress}%` }}
+          ></div>
         </div>
       </div>
       {loading && (

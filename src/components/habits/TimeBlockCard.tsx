@@ -39,14 +39,20 @@ const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
         fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive',
       }}
     >
-      <span className="text-2xl mr-2 animate-wiggle" title={block.type}>{block.icon}</span>
+      <span className="text-2xl mr-2 animate-wiggle" title={block.type}>
+        {block.icon}
+      </span>
       <div className="flex-1">
-        <div className="font-bold text-base animate-fade-in-down">{block.title}</div>
+        <div className="font-bold text-base animate-fade-in-down">
+          {block.title}
+        </div>
         <div className="text-xs text-gray-700 animate-fade-in">
           {block.startTime} - {block.endTime}
         </div>
         {block.notes && (
-          <div className="text-xs text-gray-600 italic animate-fade-in-slow">{block.notes}</div>
+          <div className="text-xs text-gray-600 italic animate-fade-in-slow">
+            {block.notes}
+          </div>
         )}
       </div>
       <button

@@ -20,16 +20,6 @@ interface Habit {
   history: string[]; // Array of ISO date strings when completed
 }
 
-// Reminder type
-interface Reminder {
-  id: number;
-  hour: number;
-  minute: number;
-  message: string;
-  sound: boolean;
-  vibrate: boolean;
-}
-
 // --- App Date Override for Testing ---
 interface HabitListProps {
   appDate: string | null;
@@ -41,13 +31,6 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
   const { user } = useAuth();
   const [newHabit, setNewHabit] = useState('');
   const [showHistory, setShowHistory] = useState<number | null>(null);
-  const [reminderForm, setReminderForm] = useState({
-    hour: 20,
-    minute: 0,
-    message: '',
-    sound: false,
-    vibrate: false,
-  });
 
   // Use cheatMenu.habits as the source of truth for habits
   const habits = cheatMenu.habits;
@@ -191,39 +174,6 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
     return () => timers.forEach((timer) => clearTimeout(timer));
   }, [habits, reminders]);
 
-  // Reminder management handlers (Firestore)
-  const addReminder = async () => {
-    if (!user) return;
-    const reminder = {
-      id: Date.now() + Math.floor(Math.random() * 10000),
-      hour: reminderForm.hour,
-      minute: reminderForm.minute,
-      message: reminderForm.message,
-      sound: reminderForm.sound,
-      vibrate: reminderForm.vibrate,
-    };
-    await setDoc(
-      doc(db, 'users', user.uid, 'reminders', reminder.id.toString()),
-      reminder,
-    );
-    setReminderForm({
-      hour: 20,
-      minute: 0,
-      message: '',
-      sound: false,
-      vibrate: false,
-    });
-  };
-  const deleteReminder = async (id: number) => {
-    await deleteReminderFromFirestore(id);
-  };
-  const updateReminder = async (id: number, changes: Partial<Reminder>) => {
-    const reminder = reminders.find((r) => r.id === id);
-    if (reminder) {
-      await saveReminderToFirestore({ ...reminder, ...changes });
-    }
-  };
-
   // Motivational quote of the day
   const quotes = [
     'Small steps every day lead to big results.',
@@ -238,19 +188,13 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
   const quoteOfTheDay = quotes[todayIdx];
   const perfectDay = habits.length > 0 && habits.every((h) => h.doneToday);
 
-  // Loading and error state
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   // Firestore: Load habits and reminders for the user
   useEffect(() => {
     if (!user) return;
-    setLoading(true);
-    setError(null);
     // Listen for habits
     const habitsRef = collection(db, 'users', user.uid, 'habits');
     const unsubHabits = onSnapshot(habitsRef, () => {
-      setLoading(false);
+      // No setLoading
     });
     // Listen for reminders
     const remindersRef = collection(db, 'users', user.uid, 'reminders');
@@ -273,24 +217,6 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
   const deleteHabitFromFirestore = async (id: number) => {
     if (!user) return;
     const docRef = doc(db, 'users', user.uid, 'habits', id.toString());
-    await deleteDoc(docRef);
-  };
-  // Firestore: Save reminder changes
-  const saveReminderToFirestore = async (reminder: Reminder) => {
-    if (!user) return;
-    const docRef = doc(
-      db,
-      'users',
-      user.uid,
-      'reminders',
-      reminder.id.toString(),
-    );
-    await setDoc(docRef, reminder);
-  };
-  // Firestore: Delete reminder
-  const deleteReminderFromFirestore = async (id: number) => {
-    if (!user) return;
-    const docRef = doc(db, 'users', user.uid, 'reminders', id.toString());
     await deleteDoc(docRef);
   };
 
@@ -416,11 +342,16 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
             <span>📝 Your Habits</span>
           </RoughNotation>
         </span>
-        <span className="text-2xl md:text-3xl select-none animate-bounce">🌱</span>
+        <span className="text-2xl md:text-3xl select-none animate-bounce">
+          🌱
+        </span>
       </div>
       {/* Micro-instructions */}
       <div className="mb-2 text-center text-xs text-gray-500 dark:text-gray-300 font-hand animate-fade-in">
-        <span>Tip: Click a habit name to edit. Mark as done to keep your streak! <span className="ml-1">✨</span></span>
+        <span>
+          Tip: Click a habit name to edit. Mark as done to keep your streak!{' '}
+          <span className="ml-1">✨</span>
+        </span>
       </div>
       {/* Motivational Quote */}
       <div className="mb-4 text-center italic text-sky-600 dark:text-sky-300 text-base font-hand animate-fade-in-slow">
