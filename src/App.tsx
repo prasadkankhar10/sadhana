@@ -13,6 +13,7 @@ import HabitList from './components/habits/HabitList';
 import TimeBlockScheduler from './components/habits/TimeBlockScheduler';
 import HabitAnalytics from './components/habits/HabitAnalytics';
 import DeveloperCheatMenu from './components/common/DeveloperCheatMenu';
+import DailyJournal from './components/DailyJournal';
 import './index.css';
 
 // --- CheatMenuContext ---
@@ -60,7 +61,7 @@ interface Reminder {
 }
 
 function SadhanaApp() {
-  const [tab, setTab] = React.useState<'habits' | 'schedule' | 'analytics'>(
+  const [tab, setTab] = React.useState<'habits' | 'schedule' | 'analytics' | 'journal'>(
     'habits',
   );
   const [appDate, setAppDate] = React.useState<string | null>(null);
@@ -244,12 +245,19 @@ function SadhanaApp() {
             >
               Analytics
             </button>
+            <button
+              className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'journal' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
+              onClick={() => setTab('journal')}
+            >
+              Journal
+            </button>
           </div>
           {tab === 'habits' && (
             <HabitList appDate={appDate} setAppDate={setAppDate} />
           )}
           {tab === 'schedule' && <TimeBlockScheduler />}
           {tab === 'analytics' && <HabitAnalytics />}
+          {tab === 'journal' && <DailyJournal appDate={appDate} />}
         </div>
         <DeveloperCheatMenu
           habitsCount={habitsCount}
