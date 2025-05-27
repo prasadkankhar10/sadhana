@@ -10,6 +10,8 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { RoughNotation } from 'react-rough-notation';
+import '../../doodle.css';
+import Confetti from 'react-confetti';
 
 interface Habit {
   id: number;
@@ -31,6 +33,7 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
   const { user } = useAuth();
   const [newHabit, setNewHabit] = useState('');
   const [showHistory, setShowHistory] = useState<number | null>(null);
+  const [showCoachmark, setShowCoachmark] = useState(true);
 
   // Use cheatMenu.habits as the source of truth for habits
   const habits = cheatMenu.habits;
@@ -253,18 +256,41 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
       'repeating-linear-gradient(0deg, var(--journal-bg, #fdf6e3) 0px, var(--journal-bg, #fdf6e3) 31px, var(--journal-line, #e0d7c3) 32px, var(--journal-bg, #fdf6e3) 33px)',
     backgroundColor: 'var(--journal-bg, #fdf6e3)',
   };
-  const handDrawnBorder = {
-    border: '3px solid #222',
-    borderRadius: '32px',
-    boxShadow: '0 6px 32px 0 rgba(60,40,10,0.10), 0 0 0 6px #f5e9c6',
+  // const handDrawnBorder = {
+  //   border: '3px solid #222',
+  //   borderRadius: '32px',
+  //   boxShadow: '0 6px 32px 0 rgba(60,40,10,0.10), 0 0 0 6px #f5e9c6',
+  // };
+
+  // Helper to get a random sparkle image for a habit
+  const sparkleImages = [
+    '/SparkleImg/sparkle1.png',
+    '/SparkleImg/sparkle2.png',
+    '/SparkleImg/sparkle3.png',
+    '/SparkleImg/sparkle4.png',
+    '/SparkleImg/sparkle5.png',
+  ];
+  function getSparkleForHabit(habitId: number): string {
+    // Deterministic random: always same image for same habit
+    return sparkleImages[habitId % sparkleImages.length];
+  }
+
+  // Onboarding Coachmark logic
+  useEffect(() => {
+    if (localStorage.getItem('sadhana_onboarded')) {
+      setShowCoachmark(false);
+    }
+  }, []);
+  const handleDismissCoachmark = () => {
+    setShowCoachmark(false);
+    localStorage.setItem('sadhana_onboarded', '1');
   };
 
   return (
     <div
-      className="relative max-w-3xl mx-auto mt-8 p-4 md:p-10 overflow-hidden"
+      className="relative max-w-3xl mx-auto mt-8 p-4 md:p-10 overflow-hidden doodle-border"
       style={{
         ...paperBg,
-        ...handDrawnBorder,
         fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive',
         position: 'relative',
       }}
@@ -368,11 +394,19 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
       </div>
       {/* Perfect Day Badge */}
       {perfectDay && (
-        <div className="mb-4 flex justify-center animate-pop-in">
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-400 text-white text-xs font-bold shadow font-hand animate-wiggle">
-            🌟 Perfect Day! All habits completed! 🌟
-          </span>
-        </div>
+        <>
+          <Confetti
+            width={window.innerWidth}
+            height={window.innerHeight}
+            numberOfPieces={200}
+            recycle={false}
+          />
+          <div className="mb-4 flex justify-center animate-pop-in">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-400 text-white text-xs font-bold shadow font-hand animate-wiggle">
+              🌟 Perfect Day! All habits completed! 🌟
+            </span>
+          </div>
+        </>
       )}
       {/* Progress Bar */}
       <div className="mb-6 animate-fade-in">
@@ -386,12 +420,19 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
         </div>
         <div
           className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 border-2 border-dashed border-sky-300 shadow-inner"
-          style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
+          style={{ boxShadow: '2px 2px 0 #e0d7c3', position: 'relative' }}
         >
           <div
             className="bg-sky-400 h-3 rounded-full transition-all font-hand animate-progress"
-            style={{ width: `${progress}%` }}
-          ></div>
+            style={{ width: `${progress}%`, position: 'relative' }}
+          >
+            <span
+              className="absolute right-0 -top-6 text-sky-500 text-lg animate-bounce"
+              style={{ display: progress === 100 ? 'inline' : 'none' }}
+            >
+              🎉
+            </span>
+          </div>
         </div>
       </div>
       {/* Filter Buttons */}
@@ -449,7 +490,18 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
       <ul className="mb-8 animate-fade-in-slow">
         {filteredHabits.length === 0 && (
           <li className="text-center text-gray-500 dark:text-gray-300 font-hand">
-            No habits to show.
+            <div className="flex flex-col items-center">
+              <img
+                src="https://raw.githubusercontent.com/stevenlei/handdrawn-icons/main/empty-box.svg"
+                alt="No habits"
+                width="80"
+                height="80"
+                style={{ opacity: 0.7 }}
+              />
+              <div className="mt-2">
+                No habits to show. Add your first habit!
+              </div>
+            </div>
           </li>
         )}
         {filteredHabits.map((habit) => (
@@ -466,19 +518,38 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
               }
             >
               <input
+                type="checkbox"
+                className="doodle-checkbox mr-2"
+                checked={habit.doneToday}
+                onChange={() => toggleHabit(habit.id)}
+                disabled={habit.doneToday}
+                aria-label="Mark as done"
+              />
+              <input
                 className="bg-transparent border-none outline-none font-semibold text-base w-auto max-w-xs dark:bg-transparent font-hand"
                 value={habit.name}
                 onChange={(e) => editHabit(habit.id, e.target.value)}
                 disabled={habit.doneToday}
                 aria-label="Edit habit name"
               />
-              <span className="ml-2 text-xs text-sky-500 dark:text-sky-300 font-semibold font-hand">
+              <span className="ml-2 text-xs text-sky-500 dark:text-sky-300 font-semibold font-hand doodle-wiggle">
                 🔥 Streak: {habit.streak}
               </span>
+              {habit.doneToday && (
+                <span className="ml-2 animate-bounce" title="Completed">
+                  <img
+                    src={getSparkleForHabit(habit.id)}
+                    alt="Sparkle"
+                    width="22"
+                    height="22"
+                    style={{ display: 'inline' }}
+                  />
+                </span>
+              )}
             </span>
             <div className="flex flex-wrap gap-2 md:gap-2 items-center justify-end">
               <button
-                className={`px-3 py-1 rounded-xl border-2 border-dashed font-bold transition-colors w-full md:w-auto font-hand shadow ${
+                className={`px-3 py-1 rounded-xl border-2 border-dashed font-bold transition-colors w-full md:w-auto font-hand shadow doodle-bounce ${
                   habit.doneToday
                     ? 'bg-green-400 text-white cursor-not-allowed opacity-60 border-green-700'
                     : 'bg-[#fffbe6] text-gray-900 border-sky-300 hover:bg-sky-100 border-sky-400'
@@ -489,14 +560,14 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
                 {habit.doneToday ? '✅ Done!' : 'Mark as Done'}
               </button>
               <button
-                className="px-2 py-1 rounded-xl bg-red-400 hover:bg-red-500 text-white text-xs font-bold w-full md:w-auto font-hand border-2 border-dashed border-red-400 shadow"
+                className="px-2 py-1 rounded-xl bg-red-400 hover:bg-red-500 text-white text-xs font-bold w-full md:w-auto font-hand border-2 border-dashed border-red-400 shadow doodle-bounce"
                 onClick={() => deleteHabit(habit.id)}
                 title="Delete habit"
               >
                 🗑️
               </button>
               <button
-                className="px-2 py-1 rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white text-xs font-bold w-full md:w-auto font-hand border-2 border-dashed border-indigo-400 shadow"
+                className="px-2 py-1 rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white text-xs font-bold w-full md:w-auto font-hand border-2 border-dashed border-indigo-400 shadow doodle-bounce"
                 onClick={() => setShowHistory(habit.id)}
                 title="View history"
               >
@@ -532,6 +603,27 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
           appDate={appDate}
           getToday={getToday}
         />
+      )}
+      {/* Onboarding Coachmark */}
+      {showCoachmark && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-xl shadow-lg p-6 max-w-xs mx-auto border-4 border-dashed border-sky-300 animate-pop-in">
+            <h2 className="text-xl font-bold mb-2 text-sky-700 font-hand">
+              Welcome to Sadhana!
+            </h2>
+            <p className="mb-4 text-gray-700 font-hand">
+              Track your habits, mark them as done, and build your streak! 🎉
+              <br />
+              Click a habit name to edit. Mark as done to see a sparkle!
+            </p>
+            <button
+              className="mt-2 px-4 py-2 bg-sky-400 text-white rounded-xl font-bold font-hand border-2 border-dashed border-sky-400 shadow hover:bg-sky-500"
+              onClick={handleDismissCoachmark}
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
