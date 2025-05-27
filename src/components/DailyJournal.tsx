@@ -57,10 +57,16 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
   const [entry, setEntry] = useState('');
   const [mood, setMood] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [saved, setSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [history, setHistory] = useState<{date: string, mood: string, text: string}[]>([]);
+  const [history, setHistory] = useState<
+    {
+      date: string;
+      mood: string;
+      text: string;
+    }[]
+  >([]);
   const [search, setSearch] = useState('');
   const [showHistory, setShowHistory] = useState(false);
 
@@ -95,8 +101,8 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
       const fetch = async () => {
         const ref = collection(db, 'users', user.uid, 'journal');
         getDocs(ref).then((snap) => {
-          const arr: {date: string, mood: string, text: string}[] = [];
-          snap.forEach(docSnap => {
+          const arr: { date: string; mood: string; text: string }[] = [];
+          snap.forEach((docSnap) => {
             arr.push({
               date: docSnap.id,
               mood: docSnap.data().mood || '',
@@ -113,22 +119,31 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
   const handleSave = async () => {
     if (!user) return;
     setIsSaving(true);
-    await setDoc(doc(db, 'users', user.uid, 'journal', date), { text: entry, mood });
+    await setDoc(doc(db, 'users', user.uid, 'journal', date), {
+      text: entry,
+      mood,
+    });
     setIsSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   };
 
-  const filteredHistory = history.filter(h =>
-    h.text.toLowerCase().includes(search.toLowerCase()) ||
-    h.date.includes(search) ||
-    h.mood.toLowerCase().includes(search.toLowerCase())
+  const filteredHistory = history.filter(
+    (h) =>
+      h.text.toLowerCase().includes(search.toLowerCase()) ||
+      h.date.includes(search) ||
+      h.mood.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div
       className="relative max-w-3xl mx-auto mt-8 p-6 md:p-10 overflow-hidden"
-      style={{ ...paperBg, ...handDrawnBorder, fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive', position: 'relative' }}
+      style={{
+        ...paperBg,
+        ...handDrawnBorder,
+        fontFamily: 'Patrick Hand, Caveat, Gloria Hallelujah, cursive',
+        position: 'relative',
+      }}
     >
       {/* CSS Vars for light/dark mode */}
       <style>{`
@@ -153,7 +168,7 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
             className="w-4 h-4 rounded-full shadow-inner block ml-[-28px]"
             style={{
               background: 'var(--journal-hole-bg, #e0d7c3)',
-              border: '2px solid var(--journal-hole-border, #b7a77a)'
+              border: '2px solid var(--journal-hole-border, #b7a77a)',
             }}
           />
         ))}
@@ -161,7 +176,14 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
       {/* Animated Title */}
       <div className="flex items-center justify-center gap-2 mb-4">
         <span className="text-3xl md:text-4xl font-extrabold text-sky-700 dark:text-sky-300 tracking-tight drop-shadow-xl uppercase select-none flex items-center gap-2 font-hand">
-          <RoughNotation type="underline" show color="#f59e42" animationDuration={1200} padding={6} strokeWidth={3}>
+          <RoughNotation
+            type="underline"
+            show
+            color="#f59e42"
+            animationDuration={1200}
+            padding={6}
+            strokeWidth={3}
+          >
             <span>📘 Daily Journal</span>
           </RoughNotation>
         </span>
@@ -170,11 +192,13 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
       {/* Date Picker & History Toggle */}
       <div className="flex flex-col md:flex-row gap-6 mb-6 items-center justify-between">
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 font-hand">Date:</label>
+          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 font-hand">
+            Date:
+          </label>
           <input
             type="date"
             value={date}
-            onChange={e => setDate(e.target.value)}
+            onChange={(e) => setDate(e.target.value)}
             className="rounded-xl px-4 py-2 border-2 border-dashed border-sky-400 bg-[#fdf6e3] text-gray-900 font-hand focus:outline-none focus:ring-2 focus:ring-sky-400 transition w-full md:w-auto shadow-md font-semibold"
             style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
           />
@@ -182,7 +206,7 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
         </div>
         <button
           className="px-4 py-2 rounded-xl border-2 border-dashed border-sky-400 bg-[#fffbe6] hover:bg-[#fdf6e3] text-sky-700 font-bold shadow-lg transition w-full md:w-auto tracking-wide font-hand flex items-center gap-2"
-          onClick={() => setShowHistory(h => !h)}
+          onClick={() => setShowHistory((h) => !h)}
           type="button"
         >
           {showHistory ? 'Hide History' : 'Show History'} <span>📖</span>
@@ -190,8 +214,10 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
       </div>
       {/* Mood Selector */}
       <div className="mb-6 flex flex-wrap gap-3 items-center justify-center">
-        <span className="text-lg font-bold text-gray-700 dark:text-gray-200 font-hand">Mood:</span>
-        {MOODS.map(m => (
+        <span className="text-lg font-bold text-gray-700 dark:text-gray-200 font-hand">
+          Mood:
+        </span>
+        {MOODS.map((m) => (
           <button
             key={m.value}
             className={`px-4 py-2 rounded-full text-2xl border-2 border-dashed shadow-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-sky-400 font-hand ${m.value === mood ? 'bg-sky-200 text-sky-900 border-sky-700 scale-110 ring-2 ring-sky-400' : 'bg-[#fffbe6] text-gray-900 border-sky-300 hover:bg-sky-100'}`}
@@ -206,12 +232,22 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
       </div>
       {/* Animated Prompt */}
       <div className="mb-6 text-center text-sky-700 dark:text-sky-300 italic text-xl font-medium tracking-wide animate-fade-in font-hand">
-        <RoughNotation type="box" show color="#f59e42" animationDuration={900} padding={8} strokeWidth={2}>
+        <RoughNotation
+          type="box"
+          show
+          color="#f59e42"
+          animationDuration={900}
+          padding={8}
+          strokeWidth={2}
+        >
           {prompt}
         </RoughNotation>
       </div>
       {/* Journal Entry Editor */}
-      <div className="mb-6 rounded-2xl overflow-hidden border-2 border-dashed border-sky-300 shadow-lg bg-[#fffbe6] font-hand" style={{ boxShadow: '2px 2px 0 #e0d7c3' }}>
+      <div
+        className="mb-6 rounded-2xl overflow-hidden border-2 border-dashed border-sky-300 shadow-lg bg-[#fffbe6] font-hand"
+        style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
+      >
         <ReactQuill
           value={entry}
           onChange={setEntry}
@@ -232,17 +268,22 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
           <span>💾</span> {isSaving ? 'Saving...' : 'Save'}
         </button>
         {saved && (
-          <span className="text-green-500 font-bold text-lg animate-pulse font-hand">Saved!</span>
+          <span className="text-green-500 font-bold text-lg animate-pulse font-hand">
+            Saved!
+          </span>
         )}
       </div>
       {/* History Panel */}
       {showHistory && (
-        <div className="mt-8 bg-[#fffbe6]/90 rounded-2xl p-6 border-2 border-dashed border-sky-200 shadow-2xl max-h-[400px] overflow-y-auto transition-all font-hand" style={{ boxShadow: '2px 2px 0 #e0d7c3' }}>
+        <div
+          className="mt-8 bg-[#fffbe6]/90 rounded-2xl p-6 border-2 border-dashed border-sky-200 shadow-2xl max-h-[400px] overflow-y-auto transition-all font-hand"
+          style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
+        >
           <div className="mb-4 flex flex-col md:flex-row gap-3 items-center justify-between">
             <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search journal entries..."
               className="rounded-xl px-4 py-2 border-2 border-dashed border-sky-400 bg-[#fffbe6] text-gray-900 font-hand focus:outline-none focus:ring-2 focus:ring-sky-400 transition w-full md:w-auto shadow-md font-semibold"
               style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
@@ -253,22 +294,43 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
             {filteredHistory.length === 0 && (
               <div className="text-center text-gray-500">No entries found.</div>
             )}
-            {filteredHistory.map(h => (
-              <div key={h.date} className="mb-6 p-4 rounded-2xl border-2 border-dashed border-sky-100 bg-gradient-to-br from-[#fffbe6] to-[#fdf6e3] shadow-lg font-hand" style={{ boxShadow: '2px 2px 0 #e0d7c3' }}>
+            {filteredHistory.map((h) => (
+              <div
+                key={h.date}
+                className="mb-6 p-4 rounded-2xl border-2 border-dashed border-sky-100 bg-gradient-to-br from-[#fffbe6] to-[#fdf6e3] shadow-lg font-hand"
+                style={{ boxShadow: '2px 2px 0 #e0d7c3' }}
+              >
                 <div className="flex items-center gap-4 mb-2">
-                  <span className="text-2xl">{MOODS.find(m => m.value === h.mood)?.emoji || '📝'}</span>
-                  <span className="text-xs text-gray-500 font-mono">{h.date}</span>
+                  {MOODS.find((m) => m.value === h.mood)?.emoji || '📝'}
+                  <span className="text-xs text-gray-500 font-mono">
+                    {h.date}
+                  </span>
                 </div>
-                <div className="prose prose-base max-w-none font-hand" dangerouslySetInnerHTML={{ __html: h.text }} />
+                <div
+                  className="prose prose-base max-w-none font-hand"
+                  dangerouslySetInnerHTML={{ __html: h.text }}
+                />
               </div>
             ))}
           </div>
         </div>
       )}
       {/* Paper lines overlay for notebook effect */}
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        aria-hidden="true"
+      >
         {[...Array(18)].map((_, i) => (
-          <div key={i} className="w-full h-[1px]" style={{ background: 'var(--journal-line, #e0d7c3)', opacity: 0.6, position: 'absolute', top: `${(i + 1) * 32}px` }} />
+          <div
+            key={i}
+            className="w-full h-[1px]"
+            style={{
+              background: 'var(--journal-line, #e0d7c3)',
+              opacity: 0.6,
+              position: 'absolute',
+              top: `${(i + 1) * 32}px`,
+            }}
+          />
         ))}
       </div>
     </div>

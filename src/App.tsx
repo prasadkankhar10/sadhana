@@ -61,9 +61,9 @@ interface Reminder {
 }
 
 function SadhanaApp() {
-  const [tab, setTab] = React.useState<'habits' | 'schedule' | 'analytics' | 'journal'>(
-    'habits',
-  );
+  const [tab, setTab] = useState<
+    'habits' | 'schedule' | 'analytics' | 'journal'
+  >('habits');
   const [appDate, setAppDate] = React.useState<string | null>(null);
   const [habits, setHabits] = React.useState<Habit[]>([]);
   const [reminders, setReminders] = React.useState<Reminder[]>([]);
