@@ -198,24 +198,24 @@ MIT
 ```mermaid
 flowchart TD
   %% User and Entry Points
-  User([User 👤])
-  Mobile[Mobile Device 📱]
-  Desktop[Desktop/Laptop 💻]
-  App[App UI (React + Vite)]
-  PWA[PWA Shell]
+  User("User 👤")
+  Mobile("Mobile Device 📱")
+  Desktop("Desktop/Laptop 💻")
+  App("App UI: React + Vite")
+  PWA("PWA Shell")
 
   User -->|Accesses| App
   Mobile -->|PWA Install| PWA
   Desktop -->|PWA Install| PWA
 
   %% App Core
-  Auth[Google Auth (Firebase)]
-  Firestore[(Firestore DB)]
-  SW[Service Worker]
-  Manifest[Web Manifest]
-  Doodle[Doodle.css Styles]
-  Font[Handwritten Font]
-  CheatMenu[Developer Cheat Menu 🛠️]
+  Auth("Google Auth (Firebase)")
+  Firestore("Firestore DB")
+  SW("Service Worker")
+  Manifest("Web Manifest")
+  Doodle("Doodle.css Styles")
+  Font("Handwritten Font")
+  CheatMenu("Developer Cheat Menu 🛠️")
 
   App -->|Auth| Auth
   App -->|Firestore| Firestore
@@ -226,12 +226,12 @@ flowchart TD
   App -->|Cheat Menu| CheatMenu
 
   %% Features
-  Habits[HabitList.tsx]
-  Scheduler[TimeBlockScheduler.tsx]
-  Journal[DailyJournal.tsx]
-  Analytics[HabitAnalytics.tsx]
-  Reminders[notifications.ts]
-  DarkMode[DarkModeToggle.tsx]
+  Habits("HabitList.tsx")
+  Scheduler("TimeBlockScheduler.tsx")
+  Journal("DailyJournal.tsx")
+  Analytics("HabitAnalytics.tsx")
+  Reminders("notifications.ts")
+  DarkMode("DarkModeToggle.tsx")
 
   App -->|Habits| Habits
   App -->|Scheduler| Scheduler
@@ -241,9 +241,9 @@ flowchart TD
   App -->|Dark Mode| DarkMode
 
   %% Reminders/Notifications
-  LocalNotif[Local Notification API]
-  LocalStorage[(localStorage)]
-  Device[Device Hardware]
+  LocalNotif("Local Notification API")
+  LocalStorage("localStorage")
+  Device("Device Hardware")
 
   Reminders -->|Schedules| LocalNotif
   Reminders -->|Saves| LocalStorage
@@ -252,14 +252,14 @@ flowchart TD
   LocalNotif -->|Sound/Vibrate| Device
 
   %% Analytics
-  ChartJS[Chart.js, react-chartjs-2]
-  Heatmap[react-calendar-heatmap]
+  ChartJS("Chart.js, react-chartjs-2")
+  Heatmap("react-calendar-heatmap")
 
   Analytics -->|Charts| ChartJS
   Analytics -->|Heatmap| Heatmap
 
   %% PWA
-  A2HS[Add to Home Screen Prompt]
+  A2HS("Add to Home Screen Prompt")
 
   PWA -->|Offline| SW
   PWA -->|Manifest| Manifest
@@ -275,23 +275,15 @@ flowchart TD
   CheatMenu -->|Override Date| App
 
   %% User Feedback
-  UI[Micro-Interactions 🎉✨]
-  A11y[Accessibility Features ♿]
+  UI("Micro-Interactions 🎉✨")
+  A11y("Accessibility Features ♿")
 
   App -->|Confetti/Sparkle| UI
   App -->|Accessibility| A11y
 
   %% External
-  Jest[Jest, React Testing Library]
+  Jest("Jest, React Testing Library")
   App -->|Testing| Jest
-
-  %% Legend
-  classDef storage fill:#f9f,stroke:#333,stroke-width:2px;
-  class Firestore,LocalStorage storage;
-  classDef service fill:#bbf,stroke:#333,stroke-width:2px;
-  class SW,Manifest service;
-  classDef ui fill:#efe,stroke:#333,stroke-width:2px;
-  class App,Habits,Analytics,Journal,Scheduler,Reminders,CheatMenu,DarkMode,UI,A2HS,Font,Doodle ui;
 ```
 
 ---
