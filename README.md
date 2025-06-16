@@ -201,42 +201,69 @@ flowchart TD
   User([User 👤])
   Mobile[Mobile Device 📱]
   Desktop[Desktop/Laptop 💻]
-  User -->|Accesses| App[App UI (React + Vite)]
-  Mobile -->|PWA Install| PWA[PWA Shell]
+  App[App UI (React + Vite)]
+  PWA[PWA Shell]
+
+  User -->|Accesses| App
+  Mobile -->|PWA Install| PWA
   Desktop -->|PWA Install| PWA
 
   %% App Core
-  App -->|Auth| Auth[Google Auth (Firebase)]
-  App -->|Firestore| Firestore[(Firestore DB)]
-  App -->|Service Worker| SW[Service Worker]
-  App -->|Manifest| Manifest[Web Manifest]
-  App -->|Doodle.css| Doodle[Doodle.css Styles]
-  App -->|Patrick Hand| Font[Handwritten Font]
-  App -->|Cheat Menu| CheatMenu[Developer Cheat Menu 🛠️]
+  Auth[Google Auth (Firebase)]
+  Firestore[(Firestore DB)]
+  SW[Service Worker]
+  Manifest[Web Manifest]
+  Doodle[Doodle.css Styles]
+  Font[Handwritten Font]
+  CheatMenu[Developer Cheat Menu 🛠️]
+
+  App -->|Auth| Auth
+  App -->|Firestore| Firestore
+  App -->|Service Worker| SW
+  App -->|Manifest| Manifest
+  App -->|Doodle.css| Doodle
+  App -->|Patrick Hand| Font
+  App -->|Cheat Menu| CheatMenu
 
   %% Features
-  App -->|Habits| Habits[HabitList.tsx]
-  App -->|Scheduler| Scheduler[TimeBlockScheduler.tsx]
-  App -->|Journal| Journal[DailyJournal.tsx]
-  App -->|Analytics| Analytics[HabitAnalytics.tsx]
-  App -->|Reminders| Reminders[notifications.ts]
-  App -->|Dark Mode| DarkMode[DarkModeToggle.tsx]
+  Habits[HabitList.tsx]
+  Scheduler[TimeBlockScheduler.tsx]
+  Journal[DailyJournal.tsx]
+  Analytics[HabitAnalytics.tsx]
+  Reminders[notifications.ts]
+  DarkMode[DarkModeToggle.tsx]
+
+  App -->|Habits| Habits
+  App -->|Scheduler| Scheduler
+  App -->|Journal| Journal
+  App -->|Analytics| Analytics
+  App -->|Reminders| Reminders
+  App -->|Dark Mode| DarkMode
 
   %% Reminders/Notifications
-  Reminders -->|Schedules| LocalNotif[Local Notification API]
-  Reminders -->|Saves| LocalStorage[(localStorage)]
+  LocalNotif[Local Notification API]
+  LocalStorage[(localStorage)]
+  Device[Device Hardware]
+
+  Reminders -->|Schedules| LocalNotif
+  Reminders -->|Saves| LocalStorage
   Reminders -->|Service Worker| SW
   SW -->|Triggers| LocalNotif
-  LocalNotif -->|Sound/Vibrate| Device[Device Hardware]
+  LocalNotif -->|Sound/Vibrate| Device
 
   %% Analytics
-  Analytics -->|Charts| ChartJS[Chart.js, react-chartjs-2]
-  Analytics -->|Heatmap| Heatmap[react-calendar-heatmap]
+  ChartJS[Chart.js, react-chartjs-2]
+  Heatmap[react-calendar-heatmap]
+
+  Analytics -->|Charts| ChartJS
+  Analytics -->|Heatmap| Heatmap
 
   %% PWA
+  A2HS[Add to Home Screen Prompt]
+
   PWA -->|Offline| SW
   PWA -->|Manifest| Manifest
-  PWA -->|Add to Home| A2HS[Add to Home Screen Prompt]
+  PWA -->|Add to Home| A2HS
 
   %% Data Flow
   Habits -->|CRUD| Firestore
@@ -248,11 +275,15 @@ flowchart TD
   CheatMenu -->|Override Date| App
 
   %% User Feedback
-  App -->|Confetti/Sparkle| UI[Micro-Interactions 🎉✨]
-  App -->|Accessibility| A11y[Accessibility Features ♿]
+  UI[Micro-Interactions 🎉✨]
+  A11y[Accessibility Features ♿]
+
+  App -->|Confetti/Sparkle| UI
+  App -->|Accessibility| A11y
 
   %% External
-  App -->|Testing| Jest[Jest, React Testing Library]
+  Jest[Jest, React Testing Library]
+  App -->|Testing| Jest
 
   %% Legend
   classDef storage fill:#f9f,stroke:#333,stroke-width:2px;
