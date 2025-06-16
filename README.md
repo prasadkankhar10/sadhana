@@ -197,7 +197,8 @@ MIT
 
 ```mermaid
 flowchart TD
-  %% User and Entry Points
+
+  %% Entry Points
   User("User 👤")
   Mobile("Mobile Device 📱")
   Desktop("Desktop/Laptop 💻")
@@ -209,63 +210,73 @@ flowchart TD
   Desktop -->|PWA Install| PWA
 
   %% App Core
-  Auth("Google Auth (Firebase)")
-  Firestore("Firestore DB")
-  SW("Service Worker")
-  Manifest("Web Manifest")
-  Doodle("Doodle.css Styles")
-  Font("Handwritten Font")
-  CheatMenu("Developer Cheat Menu 🛠️")
+  subgraph "Core App Services"
+    Auth("🔐 Google Auth (Firebase)")
+    Firestore("🗂️ Firestore DB")
+    SW("🔁 Service Worker")
+    Manifest("📝 Web Manifest")
+    Doodle("🎨 Doodle.css Styles")
+    Font("✍️ Handwritten Font (Patrick Hand)")
+    CheatMenu("🛠️ Developer Cheat Menu")
+  end
 
-  App -->|Auth| Auth
-  App -->|Firestore| Firestore
-  App -->|Service Worker| SW
-  App -->|Manifest| Manifest
-  App -->|Doodle.css| Doodle
-  App -->|Patrick Hand| Font
-  App -->|Cheat Menu| CheatMenu
+  App --> Auth
+  App --> Firestore
+  App --> SW
+  App --> Manifest
+  App --> Doodle
+  App --> Font
+  App --> CheatMenu
 
   %% Features
-  Habits("HabitList.tsx")
-  Scheduler("TimeBlockScheduler.tsx")
-  Journal("DailyJournal.tsx")
-  Analytics("HabitAnalytics.tsx")
-  Reminders("notifications.ts")
-  DarkMode("DarkModeToggle.tsx")
+  subgraph "App Features"
+    Habits("📋 HabitList.tsx")
+    Scheduler("🕒 TimeBlockScheduler.tsx")
+    Journal("📓 DailyJournal.tsx")
+    Analytics("📊 HabitAnalytics.tsx")
+    Reminders("🔔 notifications.ts")
+    DarkMode("🌙 DarkModeToggle.tsx")
+  end
 
-  App -->|Habits| Habits
-  App -->|Scheduler| Scheduler
-  App -->|Journal| Journal
-  App -->|Analytics| Analytics
-  App -->|Reminders| Reminders
-  App -->|Dark Mode| DarkMode
+  App --> Habits
+  App --> Scheduler
+  App --> Journal
+  App --> Analytics
+  App --> Reminders
+  App --> DarkMode
 
-  %% Reminders/Notifications
-  LocalNotif("Local Notification API")
-  LocalStorage("localStorage")
-  Device("Device Hardware")
+  %% Reminders
+  subgraph "Notifications System"
+    LocalNotif("📳 Local Notification API")
+    LocalStorage("💾 localStorage")
+    Device("📱 Device Hardware")
+  end
 
   Reminders -->|Schedules| LocalNotif
   Reminders -->|Saves| LocalStorage
-  Reminders -->|Service Worker| SW
+  Reminders --> SW
   SW -->|Triggers| LocalNotif
   LocalNotif -->|Sound/Vibrate| Device
 
   %% Analytics
-  ChartJS("Chart.js, react-chartjs-2")
-  Heatmap("react-calendar-heatmap")
+  subgraph "Analytics Tools"
+    ChartJS("📈 Chart.js + react-chartjs-2")
+    Heatmap("🔥 react-calendar-heatmap")
+  end
 
-  Analytics -->|Charts| ChartJS
-  Analytics -->|Heatmap| Heatmap
+  Analytics --> ChartJS
+  Analytics --> Heatmap
 
-  %% PWA
-  A2HS("Add to Home Screen Prompt")
+  %% PWA Specific
+  subgraph "PWA Support"
+    A2HS("📌 Add to Home Screen Prompt")
+  end
 
-  PWA -->|Offline| SW
-  PWA -->|Manifest| Manifest
-  PWA -->|Add to Home| A2HS
+  PWA --> SW
+  PWA --> Manifest
+  PWA --> A2HS
 
-  %% Data Flow
+  %% Data Flow to Firestore
   Habits -->|CRUD| Firestore
   Scheduler -->|CRUD| Firestore
   Journal -->|CRUD| Firestore
@@ -274,17 +285,19 @@ flowchart TD
   CheatMenu -->|Reset/Add Test Data| Firestore
   CheatMenu -->|Override Date| App
 
-  %% User Feedback
-  UI("Micro-Interactions 🎉✨")
-  A11y("Accessibility Features ♿")
+  %% UI Feedback
+  subgraph "User Feedback & UX"
+    UI("🎉 Micro-Interactions (Confetti/Sparkle)")
+    A11y("♿ Accessibility Features")
+  end
 
-  App -->|Confetti/Sparkle| UI
-  App -->|Accessibility| A11y
+  App --> UI
+  App --> A11y
 
-  %% External
-  Jest("Jest, React Testing Library")
-  App -->|Testing| Jest
-```
+  %% External Testing
+  Jest("🧪 Jest + React Testing Library")
+  App --> Jest
+
 
 ---
 
