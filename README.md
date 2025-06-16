@@ -299,8 +299,6 @@ flowchart TD
   App --> Jest
 
 
-
-
 ---
 
 ## Every Detail Matters
