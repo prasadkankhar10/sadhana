@@ -209,15 +209,15 @@ flowchart TD
   Mobile -->|PWA Install| PWA
   Desktop -->|PWA Install| PWA
 
-  %% App Core
+  %% Core App Services
   subgraph "Core App Services"
-    Auth("🔐 Google Auth (Firebase)")
-    Firestore("🗂️ Firestore DB")
-    SW("🔁 Service Worker")
-    Manifest("📝 Web Manifest")
-    Doodle("🎨 Doodle.css Styles")
-    Font("✍️ Handwritten Font (Patrick Hand)")
-    CheatMenu("🛠️ Developer Cheat Menu")
+    Auth("Google Auth (Firebase)")
+    Firestore("Firestore DB")
+    SW("Service Worker")
+    Manifest("Web Manifest")
+    Doodle("Doodle.css Styles")
+    Font("Patrick Hand Font")
+    CheatMenu("Developer Cheat Menu 🛠️")
   end
 
   App --> Auth
@@ -228,14 +228,14 @@ flowchart TD
   App --> Font
   App --> CheatMenu
 
-  %% Features
+  %% App Features
   subgraph "App Features"
-    Habits("📋 HabitList.tsx")
-    Scheduler("🕒 TimeBlockScheduler.tsx")
-    Journal("📓 DailyJournal.tsx")
-    Analytics("📊 HabitAnalytics.tsx")
-    Reminders("🔔 notifications.ts")
-    DarkMode("🌙 DarkModeToggle.tsx")
+    Habits("HabitList.tsx")
+    Scheduler("TimeBlockScheduler.tsx")
+    Journal("DailyJournal.tsx")
+    Analytics("HabitAnalytics.tsx")
+    Reminders("notifications.ts")
+    DarkMode("DarkModeToggle.tsx")
   end
 
   App --> Habits
@@ -245,11 +245,11 @@ flowchart TD
   App --> Reminders
   App --> DarkMode
 
-  %% Reminders
-  subgraph "Notifications System"
-    LocalNotif("📳 Local Notification API")
-    LocalStorage("💾 localStorage")
-    Device("📱 Device Hardware")
+  %% Notifications System
+  subgraph "Notification System"
+    LocalNotif("Local Notification API")
+    LocalStorage("localStorage")
+    Device("Device Hardware")
   end
 
   Reminders -->|Schedules| LocalNotif
@@ -258,25 +258,25 @@ flowchart TD
   SW -->|Triggers| LocalNotif
   LocalNotif -->|Sound/Vibrate| Device
 
-  %% Analytics
+  %% Analytics Tools
   subgraph "Analytics Tools"
-    ChartJS("📈 Chart.js + react-chartjs-2")
-    Heatmap("🔥 react-calendar-heatmap")
+    ChartJS("Chart.js + react-chartjs-2")
+    Heatmap("react-calendar-heatmap")
   end
 
   Analytics --> ChartJS
   Analytics --> Heatmap
 
-  %% PWA Specific
+  %% PWA Support
   subgraph "PWA Support"
-    A2HS("📌 Add to Home Screen Prompt")
+    A2HS("Add to Home Screen Prompt")
   end
 
   PWA --> SW
   PWA --> Manifest
   PWA --> A2HS
 
-  %% Data Flow to Firestore
+  %% Data Flow
   Habits -->|CRUD| Firestore
   Scheduler -->|CRUD| Firestore
   Journal -->|CRUD| Firestore
@@ -285,20 +285,19 @@ flowchart TD
   CheatMenu -->|Reset/Add Test Data| Firestore
   CheatMenu -->|Override Date| App
 
-  %% UI Feedback
+  %% User Feedback and UX
   subgraph "User Feedback & UX"
-    UI("🎉 Micro-Interactions (Confetti/Sparkle)")
-    A11y("♿ Accessibility Features")
+    UI("Micro-Interactions 🎉✨")
+    A11y("Accessibility Features ♿")
   end
 
   App --> UI
   App --> A11y
 
-  %% External Testing
-  Jest("🧪 Jest + React Testing Library")
+  %% Testing
+  Jest("Jest + React Testing Library")
   App --> Jest
 
-  %% Every Detail Matters
 
 
 
