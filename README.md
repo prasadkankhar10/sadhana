@@ -297,9 +297,7 @@ flowchart TD
   %% Testing
   Jest("Jest + React Testing Library")
   App --> Jest
-
-
----
+```
 
 ## Every Detail Matters
 
