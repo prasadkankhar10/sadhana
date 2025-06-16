@@ -210,7 +210,7 @@ flowchart TD
   Desktop -->|PWA Install| PWA
 
   %% Core App Services
-  subgraph "Core App Services"
+  subgraph CoreAppServices["Core App Services"]
     Auth("Google Auth (Firebase)")
     Firestore("Firestore DB")
     SW("Service Worker")
@@ -219,6 +219,7 @@ flowchart TD
     Font("Patrick Hand Font")
     CheatMenu("Developer Cheat Menu 🛠️")
   end
+  class CoreAppServices corebg;
 
   App --> Auth
   App --> Firestore
@@ -229,7 +230,7 @@ flowchart TD
   App --> CheatMenu
 
   %% App Features
-  subgraph "App Features"
+  subgraph AppFeatures["App Features"]
     Habits("HabitList.tsx")
     Scheduler("TimeBlockScheduler.tsx")
     Journal("DailyJournal.tsx")
@@ -237,6 +238,7 @@ flowchart TD
     Reminders("notifications.ts")
     DarkMode("DarkModeToggle.tsx")
   end
+  class AppFeatures featurebg;
 
   App --> Habits
   App --> Scheduler
@@ -246,11 +248,12 @@ flowchart TD
   App --> DarkMode
 
   %% Notifications System
-  subgraph "Notification System"
+  subgraph NotificationSystem["Notification System"]
     LocalNotif("Local Notification API")
     LocalStorage("localStorage")
     Device("Device Hardware")
   end
+  class NotificationSystem notifbg;
 
   Reminders -->|Schedules| LocalNotif
   Reminders -->|Saves| LocalStorage
@@ -259,18 +262,20 @@ flowchart TD
   LocalNotif -->|Sound/Vibrate| Device
 
   %% Analytics Tools
-  subgraph "Analytics Tools"
+  subgraph AnalyticsTools["Analytics Tools"]
     ChartJS("Chart.js + react-chartjs-2")
     Heatmap("react-calendar-heatmap")
   end
+  class AnalyticsTools analyticbg;
 
   Analytics --> ChartJS
   Analytics --> Heatmap
 
   %% PWA Support
-  subgraph "PWA Support"
+  subgraph PWASupport["PWA Support"]
     A2HS("Add to Home Screen Prompt")
   end
+  class PWASupport pwabg;
 
   PWA --> SW
   PWA --> Manifest
@@ -286,10 +291,11 @@ flowchart TD
   CheatMenu -->|Override Date| App
 
   %% User Feedback and UX
-  subgraph "User Feedback & UX"
+  subgraph UserFeedback["User Feedback & UX"]
     UI("Micro-Interactions 🎉✨")
     A11y("Accessibility Features ♿")
   end
+  class UserFeedback feedbackbg;
 
   App --> UI
   App --> A11y
@@ -297,6 +303,20 @@ flowchart TD
   %% Testing
   Jest("Jest + React Testing Library")
   App --> Jest
+
+  %% Styling
+  classDef corebg fill:#f3e5f5,stroke:#ab47bc,stroke-width:2px;
+  classDef featurebg fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+  classDef notifbg fill:#b2ebf2,stroke:#00838f,stroke-width:2px;
+  classDef analyticbg fill:#c8e6c9,stroke:#388e3c,stroke-width:2px;
+  classDef pwabg fill:#ffe0b2,stroke:#f57c00,stroke-width:2px;
+  classDef feedbackbg fill:#ffccbc,stroke:#d84315,stroke-width:2px;
+
+  style App fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
+  style PWA fill:#fce4ec,stroke:#ad1457,stroke-width:2px;
+  style User fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
+  style Mobile fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
+  style Desktop fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
 ```
 
 ## Every Detail Matters
