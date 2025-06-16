@@ -167,7 +167,7 @@ The journey included:
 ## Getting Started
 
 1. **Clone the repo:**  
-   `git clone https://github.com/yourusername/sadhana.git`
+   `git clone https://github.com/prasadkankhar10/sadhana`
 2. **Install dependencies:**  
    `npm install`
 3. **Set up Firebase:**  
