@@ -1,13 +1,15 @@
 /* Doodle.css - playful hand-drawn borders and dividers */
 .doodle-border {
   border: 3px solid transparent;
-  border-image: url('data:image/svg+xml;utf8,<svg width="32" height="8" xmlns="http://www.w3.org/2000/svg"><path d="M2,6 Q8,2 16,6 T30,6" fill="none" stroke="%23222" stroke-width="2.5"/></svg>') 8 repeat;
+  border-image: url('data:image/svg+xml;utf8,<svg width="32" height="8" xmlns="http://www.w3.org/2000/svg"><path d="M2,6 Q8,2 16,6 T30,6" fill="none" stroke="%23222" stroke-width="2.5"/></svg>')
+    8 repeat;
   border-radius: 32px;
 }
 .doodle-divider {
   width: 100%;
   height: 12px;
-  background: url('data:image/svg+xml;utf8,<svg width="100%25" height="12" xmlns="http://www.w3.org/2000/svg"><path d="M0,8 Q20,2 40,8 T100,8" fill="none" stroke="%23b7a77a" stroke-width="2.5"/></svg>') repeat-x;
+  background: url('data:image/svg+xml;utf8,<svg width="100%25" height="12" xmlns="http://www.w3.org/2000/svg"><path d="M0,8 Q20,2 40,8 T100,8" fill="none" stroke="%23b7a77a" stroke-width="2.5"/></svg>')
+    repeat-x;
   margin: 1.5rem 0;
 }
 .doodle-checkbox {
@@ -39,7 +41,7 @@
   outline-offset: 2px;
 }
 .doodle-bounce {
-  transition: transform 0.1s cubic-bezier(.4,2,.6,1);
+  transition: transform 0.1s cubic-bezier(0.4, 2, 0.6, 1);
 }
 .doodle-bounce:active {
   transform: scale(0.92);
@@ -48,16 +50,26 @@
   animation: doodle-wiggle 1.2s infinite alternate;
 }
 @keyframes doodle-wiggle {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
 }
 .doodle-confetti {
   pointer-events: none;
   position: fixed;
-  left: 0; top: 0; width: 100vw; height: 100vh;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 9999;
   animation: fadeOut 1.5s 1.2s forwards;
 }
 @keyframes fadeOut {
-  to { opacity: 0; }
+  to {
+    opacity: 0;
+  }
 }

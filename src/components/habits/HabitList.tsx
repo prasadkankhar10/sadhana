@@ -12,6 +12,14 @@ import {
 import { RoughNotation } from 'react-rough-notation';
 import '../../doodle.css';
 import Confetti from 'react-confetti';
+import {
+  HabitReminder,
+  saveReminders,
+  loadReminders,
+  requestNotificationPermission,
+  showTestNotification,
+  showAddToHomeScreenPrompt,
+} from '../../utils/notifications';
 
 interface Habit {
   id: number;
@@ -34,6 +42,21 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
   const [newHabit, setNewHabit] = useState('');
   const [showHistory, setShowHistory] = useState<number | null>(null);
   const [showCoachmark, setShowCoachmark] = useState(true);
+  const [showReminderModal, setShowReminderModal] = useState<null | Habit>(
+    null,
+  );
+  const [reminderTime, setReminderTime] = useState('07:00');
+  const [reminderSound, setReminderSound] = useState(true);
+  const [reminderVibrate, setReminderVibrate] = useState(true);
+  const [reminderConfetti, setReminderConfetti] = useState(false);
+  const [reminderError, setReminderError] = useState<string | null>(null);
+  const [activeReminders, setActiveReminders] = useState<HabitReminder[]>([]);
+
+  // Add to Home Screen prompt state
+  const [showA2HS, setShowA2HS] = useState(false);
+  const [triggerA2HS, setTriggerA2HS] = useState<
+    null | (() => Promise<string | null>)
+  >(null);
 
   // Use cheatMenu.habits as the source of truth for habits
   const habits = cheatMenu.habits;
@@ -286,6 +309,60 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
     localStorage.setItem('sadhana_onboarded', '1');
   };
 
+  // Load existing reminder for habit when opening modal
+  useEffect(() => {
+    if (showReminderModal) {
+      const reminders = loadReminders();
+      const rem = reminders.find((r) => r.habitId === showReminderModal.id);
+      if (rem) {
+        setReminderTime(rem.time);
+        setReminderSound(true); // For now, always true
+        setReminderVibrate(true); // For now, always true
+      } else {
+        setReminderTime('07:00');
+        setReminderSound(true);
+        setReminderVibrate(true);
+      }
+    }
+  }, [showReminderModal]);
+
+  const handleSaveReminder = async () => {
+    if (!showReminderModal) return;
+    const perm = await requestNotificationPermission();
+    if (perm !== 'granted') {
+      setReminderError(
+        'Notifications are blocked. Please enable them in your browser settings.',
+      );
+      return;
+    }
+    setReminderError(null);
+    const reminders = loadReminders().filter(
+      (r) => r.habitId !== showReminderModal.id,
+    );
+    reminders.push({
+      habitId: showReminderModal.id,
+      habitName: showReminderModal.name,
+      time: reminderTime,
+    });
+    saveReminders(reminders);
+    setActiveReminders(reminders);
+    setReminderConfetti(true);
+    setTimeout(() => setReminderConfetti(false), 1200);
+    setShowReminderModal(null);
+  };
+  const handleDeleteReminder = (habitId: number) => {
+    const reminders = loadReminders().filter((r) => r.habitId !== habitId);
+    saveReminders(reminders);
+    setActiveReminders(reminders);
+  };
+
+  // Setup Add to Home Screen prompt on mount (mobile only)
+  useEffect(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    const trigger = showAddToHomeScreenPrompt(setShowA2HS);
+    setTriggerA2HS(() => trigger);
+  }, []);
+
   return (
     <div
       className="relative max-w-3xl mx-auto mt-8 p-4 md:p-10 overflow-hidden doodle-border"
@@ -486,6 +563,42 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
           ➕ Add
         </button>
       </div>
+      {/* Reminders List (playful, hand-drawn) */}
+      <div className="mb-6 animate-fade-in">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-lg font-hand">⏰ Reminders</span>
+          <span className="text-xs text-gray-400 font-hand">
+            (tap ⏰ on a habit to add)
+          </span>
+        </div>
+        {activeReminders.length === 0 ? (
+          <div className="italic text-gray-400 font-hand text-sm">
+            No reminders set. Add one for a habit!
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {activeReminders.map((rem) => (
+              <li
+                key={rem.habitId}
+                className="flex items-center gap-2 bg-[#fffbe6] border-2 border-dashed border-yellow-300 rounded-xl px-3 py-2 font-hand shadow animate-pop-in"
+              >
+                <span className="text-lg">⏰</span>
+                <span className="flex-1">
+                  {rem.habitName}{' '}
+                  <span className="ml-2 text-xs text-gray-500">{rem.time}</span>
+                </span>
+                <button
+                  className="text-red-400 hover:text-red-600 text-xl font-bold ml-2"
+                  title="Delete reminder"
+                  onClick={() => handleDeleteReminder(rem.habitId)}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       {/* Habits List */}
       <ul className="mb-8 animate-fade-in-slow">
         {filteredHabits.length === 0 && (
@@ -573,6 +686,13 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
               >
                 📅
               </button>
+              <button
+                className="px-2 py-1 rounded-xl bg-yellow-300 hover:bg-yellow-400 text-yellow-900 text-xs font-bold w-full md:w-auto font-hand border-2 border-dashed border-yellow-400 shadow doodle-bounce"
+                onClick={() => setShowReminderModal(habit)}
+                title="Set reminder"
+              >
+                ⏰
+              </button>
             </div>
           </li>
         ))}
@@ -623,6 +743,104 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
               Got it!
             </button>
           </div>
+        </div>
+      )}
+      {/* Reminder Modal (polished, playful) */}
+      {showReminderModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="relative bg-[#fffbe6] dark:bg-[#23272e] rounded-3xl p-8 border-4 border-dashed border-sky-400 shadow-2xl font-hand animate-pop-in max-w-xs w-full">
+            <button
+              className="absolute top-2 right-2 text-2xl hover:scale-125 transition"
+              onClick={() => setShowReminderModal(null)}
+              aria-label="Close"
+            >
+              ✖️
+            </button>
+            <div className="flex flex-col items-center gap-4">
+              <span className="text-3xl">⏰</span>
+              <h2 className="text-xl font-bold mb-2">
+                Set Reminder for &quot;{showReminderModal.name}&quot;
+              </h2>
+              <input
+                type="time"
+                className="rounded-xl border-2 border-dashed border-sky-400 px-4 py-2 font-hand text-lg"
+                value={reminderTime}
+                onChange={(e) => setReminderTime(e.target.value)}
+              />
+              <div className="flex gap-4 mt-2">
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={reminderSound}
+                    onChange={(e) => setReminderSound(e.target.checked)}
+                  />
+                  <span>🔔 Sound</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={reminderVibrate}
+                    onChange={(e) => setReminderVibrate(e.target.checked)}
+                  />
+                  <span>📳 Vibrate</span>
+                </label>
+              </div>
+              <button
+                className="mt-4 px-6 py-2 rounded-xl bg-sky-400 hover:bg-sky-500 text-white font-bold border-2 border-dashed border-sky-400 shadow animate-bounce"
+                onClick={handleSaveReminder}
+              >
+                Save Reminder
+              </button>
+              <button
+                className="mt-2 text-xs underline text-sky-700"
+                onClick={showTestNotification}
+              >
+                Test Notification
+              </button>
+              {reminderError && (
+                <div className="mt-2 text-xs text-red-500 text-center">
+                  {reminderError}
+                </div>
+              )}
+              <div className="mt-2 text-xs text-gray-500 text-center">
+                <span>💡 Set a daily reminder to keep your streak!</span>
+              </div>
+            </div>
+            {reminderConfetti && (
+              <div className="absolute inset-0 pointer-events-none">
+                <span
+                  className="absolute left-1/2 top-1/2 text-4xl animate-bounce"
+                  style={{ transform: 'translate(-50%,-50%)' }}
+                >
+                  🎉
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Add to Home Screen Prompt (mobile, playful) */}
+      {showA2HS && (
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 bg-[#fffbe6] border-4 border-dashed border-sky-400 rounded-2xl shadow-xl px-6 py-4 flex items-center gap-3 animate-pop-in font-hand">
+          <span className="text-2xl">📲</span>
+          <span className="flex-1 text-base">
+            Add Sadhana to your Home Screen for the best mobile experience!
+          </span>
+          <button
+            className="px-4 py-2 bg-sky-400 hover:bg-sky-500 text-white rounded-xl font-bold border-2 border-dashed border-sky-400 shadow animate-bounce"
+            onClick={async () => {
+              if (triggerA2HS) await triggerA2HS();
+            }}
+          >
+            Add
+          </button>
+          <button
+            className="ml-2 text-gray-400 hover:text-gray-700 text-xl font-bold"
+            onClick={() => setShowA2HS(false)}
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
         </div>
       )}
     </div>
@@ -688,3 +906,11 @@ const HabitHistoryModal: React.FC<{
 };
 
 export default HabitList;
+
+// --- Mobile UI/UX improvements ---
+// Make all tap targets at least 44x44px for mobile
+// Add touch-action CSS for buttons
+// Responsive modal and reminders list
+// (Add these classes to relevant elements in the JSX below)
+// Example:
+// className="... min-h-[44px] min-w-[44px] touch-manipulation ..."
