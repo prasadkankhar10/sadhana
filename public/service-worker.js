@@ -6,6 +6,8 @@ const urlsToCache = [
   '/icon-192.png',
   '/icon-512.png',
   '/manifest.json',
+  '/src/main.tsx',
+  '/@react-refresh'
 ];
 
 self.addEventListener('install', (event) => {
@@ -33,7 +35,15 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+      if (response) {
+        return response;
+      }
+      return fetch(event.request).catch(() => {
+        // Return a fallback response if both cache and network fail
+        return new Response('<h1>Offline</h1>', {
+          headers: { 'Content-Type': 'text/html' }
+        });
+      });
     })
   );
 });

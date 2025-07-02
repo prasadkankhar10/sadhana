@@ -20,7 +20,8 @@
     "react-confetti": "^6.4.0",
     "react-dom": "^18.0.0",
     "react-quill": "^2.0.0",
-    "react-rough-notation": "^1.0.5"
+    "react-rough-notation": "^1.0.5",
+    "react-router-dom": "^7.6.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.0.0",

@@ -18,9 +18,11 @@ interface DailyJournalProps {
   appDate: string | null;
 }
 
+// Helper function to get today's date based on appDate
 const getToday = (appDate: string | null) =>
   appDate ? appDate : new Date().toISOString().slice(0, 10);
 
+// Constants for mood options and journal prompts
 const MOODS = [
   { label: '😊 Happy', value: 'happy', emoji: '😊' },
   { label: '😐 Neutral', value: 'neutral', emoji: '😐' },
@@ -70,11 +72,12 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
   const [search, setSearch] = useState('');
   const [showHistory, setShowHistory] = useState(false);
 
+  // Effect to set a rotating journal prompt based on the current date
   useEffect(() => {
-    // Pick a prompt based on date (rotating)
     setPrompt(PROMPTS[new Date(date).getDate() % PROMPTS.length]);
   }, [date]);
 
+  // Effect to fetch the journal entry for the selected date from Firestore
   useEffect(() => {
     if (!user) return;
     setLoading(true);
@@ -94,9 +97,9 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
     fetchEntry();
   }, [user, date]);
 
+  // Effect to fetch all journal entries for the user when history is shown
   useEffect(() => {
     if (!user || !showHistory) return;
-    // Use collectionGroup for all journal entries
     import('firebase/firestore').then(({ collection, getDocs }) => {
       const fetch = async () => {
         const ref = collection(db, 'users', user.uid, 'journal');
@@ -116,6 +119,7 @@ const DailyJournal: React.FC<DailyJournalProps> = ({ appDate }) => {
     });
   }, [user, showHistory]);
 
+  // Function to save the journal entry and mood to Firestore
   const handleSave = async () => {
     if (!user) return;
     setIsSaving(true);

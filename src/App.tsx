@@ -9,12 +9,14 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import Layout from './components/layout/Layout';
+import DeveloperCheatMenu from './components/common/DeveloperCheatMenu';
+import DailyJournal from './components/DailyJournal';
+import HomePage from './components/HomePage';
+import './index.css';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import HabitList from './components/habits/HabitList';
 import TimeBlockScheduler from './components/habits/TimeBlockScheduler';
 import HabitAnalytics from './components/habits/HabitAnalytics';
-import DeveloperCheatMenu from './components/common/DeveloperCheatMenu';
-import DailyJournal from './components/DailyJournal';
-import './index.css';
 
 // --- CheatMenuContext ---
 interface CheatMenuContextType {
@@ -61,15 +63,14 @@ interface Reminder {
 }
 
 function SadhanaApp() {
-  const [tab, setTab] = useState<
-    'habits' | 'schedule' | 'analytics' | 'journal'
-  >('habits');
   const [appDate, setAppDate] = React.useState<string | null>(null);
   const [habits, setHabits] = React.useState<Habit[]>([]);
   const [reminders, setReminders] = React.useState<Reminder[]>([]);
 
   // --- Firestore integration ---
   const { user } = useAuth();
+  // Function to fetch habits and reminders from Firestore.
+  // If removed, the app will lose the ability to sync data with Firestore.
   React.useEffect(() => {
     if (!user) return;
     // Habits
@@ -117,6 +118,8 @@ function SadhanaApp() {
   const remindersCount = reminders.length;
 
   // --- Cheat menu handlers ---
+  // Function to reset all habits to their initial state.
+  // If removed, developers will lose the ability to reset habits for testing.
   const onResetHabits = async (): Promise<void> => {
     if (!user) return;
     for (const habit of habits) {
@@ -129,6 +132,8 @@ function SadhanaApp() {
       });
     }
   };
+  // Function to mark all habits as done for the current day.
+  // If removed, developers will lose the ability to simulate habit completion.
   const onMarkAllDone = async (): Promise<void> => {
     if (!user) return;
     const today = appDate || new Date().toISOString().slice(0, 10);
@@ -142,6 +147,8 @@ function SadhanaApp() {
       });
     }
   };
+  // Function to clear all reminders.
+  // If removed, developers will lose the ability to delete reminders for testing.
   const onClearReminders = async (): Promise<void> => {
     if (!user) return;
     for (const reminder of reminders) {
@@ -150,6 +157,8 @@ function SadhanaApp() {
       );
     }
   };
+  // Function to add a test habit.
+  // If removed, developers will lose the ability to quickly add test habits.
   const onAddTestHabit = async (): Promise<void> => {
     if (!user) return;
     const habit: Habit = {
@@ -165,6 +174,8 @@ function SadhanaApp() {
       habit,
     );
   };
+  // Function to add a test reminder.
+  // If removed, developers will lose the ability to quickly add test reminders.
   const onAddTestReminder = async (): Promise<void> => {
     if (!user) return;
     const reminder: Reminder = {
@@ -180,6 +191,8 @@ function SadhanaApp() {
       reminder,
     );
   };
+  // Function to delete all user data.
+  // If removed, developers will lose the ability to reset the app completely.
   const onDeleteAllData = async (): Promise<void> => {
     if (!user) return;
     const confirmed = window.confirm(
@@ -254,39 +267,14 @@ function SadhanaApp() {
           .animate-wiggle { animation: wiggle 1.2s infinite alternate; }
         `}</style>
         <Layout>
-          <div className="w-full max-w-2xl mx-auto">
-            <div className="flex justify-center gap-4 mb-6 mt-2">
-              <button
-                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'habits' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-                onClick={() => setTab('habits')}
-              >
-                Habits
-              </button>
-              <button
-                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'schedule' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-                onClick={() => setTab('schedule')}
-              >
-                Time-blocks
-              </button>
-              <button
-                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'analytics' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-                onClick={() => setTab('analytics')}
-              >
-                Analytics
-              </button>
-              <button
-                className={`px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none ${tab === 'journal' ? 'bg-sky-400 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}
-                onClick={() => setTab('journal')}
-              >
-                Journal
-              </button>
-            </div>
-            {tab === 'habits' && (
-              <HabitList appDate={appDate} setAppDate={setAppDate} />
-            )}
-            {tab === 'schedule' && <TimeBlockScheduler />}
-            {tab === 'analytics' && <HabitAnalytics />}
-            {tab === 'journal' && <DailyJournal appDate={appDate} />}
+          <div className="w-full max-w-4xl mx-auto">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/habits" element={<HabitsPage />} />
+              <Route path="/timeblocks" element={<TimeBlocksPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/journal" element={<JournalPage />} />
+            </Routes>
           </div>
           <DeveloperCheatMenu
             habitsCount={habitsCount}
@@ -306,11 +294,42 @@ function SadhanaApp() {
   );
 }
 
+// --- Route Page Wrappers ---
+function HabitsPage() {
+  return <HabitsNavWrapper><HabitList appDate={null} setAppDate={() => {}} /></HabitsNavWrapper>;
+}
+function TimeBlocksPage() {
+  return <HabitsNavWrapper><TimeBlockScheduler /></HabitsNavWrapper>;
+}
+function AnalyticsPage() {
+  return <HabitsNavWrapper><HabitAnalytics /></HabitsNavWrapper>;
+}
+function JournalPage() {
+  return <HabitsNavWrapper><DailyJournal appDate={null} /></HabitsNavWrapper>;
+}
+
+// --- Navigation Wrapper for Tabs ---
+function HabitsNavWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="flex justify-center gap-4 mb-6 mt-8">
+        <Link to="/habits" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Habits</Link>
+        <Link to="/timeblocks" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Time-blocks</Link>
+        <Link to="/analytics" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Analytics</Link>
+        <Link to="/journal" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Journal</Link>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function App() {
   return (
-    <AuthProvider>
-      <SadhanaApp />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <SadhanaApp />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

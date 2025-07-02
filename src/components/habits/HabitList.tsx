@@ -63,6 +63,8 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
   const reminders = cheatMenu.reminders;
 
   // Update add/edit/delete logic to sync with Firestore
+  // Function to add a new habit to Firestore.
+  // If removed, users will lose the ability to create new habits.
   const addHabit = async () => {
     // Add null check for user before using in Firestore calls
     if (newHabit.trim() && user) {
@@ -82,6 +84,8 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
     }
   };
 
+  // Function to edit an existing habit's name in Firestore.
+  // If removed, users will lose the ability to rename habits.
   const editHabit = async (id: number, newName: string) => {
     const habit = habits.find((h) => h.id === id);
     if (habit) {
@@ -89,6 +93,8 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
     }
   };
 
+  // Function to delete a habit from Firestore.
+  // If removed, users will lose the ability to delete habits.
   const deleteHabit = async (id: number) => {
     const habit = habits.find((h) => h.id === id);
     if (
@@ -101,6 +107,8 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
     }
   };
 
+  // Function to toggle a habit's completion status in Firestore.
+  // If removed, users will lose the ability to mark habits as done.
   const toggleHabit = async (id: number) => {
     const today = getToday();
     const habit = habits.find((h) => h.id === id);
@@ -136,7 +144,8 @@ const HabitList: React.FC<HabitListProps> = ({ appDate }) => {
     return true;
   });
 
-  // Schedule notifications for all reminders
+  // Logic to schedule notifications for reminders.
+  // If removed, users will lose the ability to receive habit reminders.
   useEffect(() => {
     if (typeof window === 'undefined' || Notification.permission === 'denied')
       return;
