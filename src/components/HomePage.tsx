@@ -159,7 +159,11 @@ const HomePage: React.FC = () => {
           }
         } else {
           const responseBody = await response.text();
-          console.error('Unexpected response format:', contentType, responseBody);
+          console.error(
+            'Unexpected response format:',
+            contentType,
+            responseBody,
+          );
           setMotivationalMessage('Stay positive and keep moving forward!');
           setAuthor('Unknown');
         }
