@@ -11,4 +11,5 @@ module.exports = {
       tsconfig: 'tsconfig.json',
     },
   },
+  testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[tj]s?(x)'],
 };
