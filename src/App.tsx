@@ -1,24 +1,23 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import { AuthProvider, useAuth } from './firebase/AuthProvider';
 import { db } from './firebase/firebase';
 import {
   collection,
-  onSnapshot,
-  doc,
-  setDoc,
   deleteDoc,
+  doc,
+  onSnapshot,
+  setDoc,
 } from 'firebase/firestore';
 import Layout from './components/layout/Layout';
 import DeveloperCheatMenu from './components/common/DeveloperCheatMenu';
 import DailyJournal from './components/DailyJournal';
 import HomePage from './components/HomePage';
 import './index.css';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import HabitAnalytics from './components/habits/HabitAnalytics';
 import HabitList from './components/habits/HabitList';
 import TimeBlockScheduler from './components/habits/TimeBlockScheduler';
-import HabitAnalytics from './components/habits/HabitAnalytics';
 
-// --- CheatMenuContext ---
 interface CheatMenuContextType {
   habits: Habit[];
   reminders: Reminder[];
@@ -43,8 +42,6 @@ export const useCheatMenu = () => {
     );
   return ctx;
 };
-
-// Define Habit and Reminder types here for context
 interface Habit {
   id: number;
   name: string;
@@ -296,16 +293,32 @@ function SadhanaApp() {
 
 // --- Route Page Wrappers ---
 function HabitsPage() {
-  return <HabitsNavWrapper><HabitList appDate={null} setAppDate={() => {}} /></HabitsNavWrapper>;
+  return (
+    <HabitsNavWrapper>
+      <HabitList appDate={null} setAppDate={() => {}} />
+    </HabitsNavWrapper>
+  );
 }
 function TimeBlocksPage() {
-  return <HabitsNavWrapper><TimeBlockScheduler /></HabitsNavWrapper>;
+  return (
+    <HabitsNavWrapper>
+      <TimeBlockScheduler />
+    </HabitsNavWrapper>
+  );
 }
 function AnalyticsPage() {
-  return <HabitsNavWrapper><HabitAnalytics /></HabitsNavWrapper>;
+  return (
+    <HabitsNavWrapper>
+      <HabitAnalytics />
+    </HabitsNavWrapper>
+  );
 }
 function JournalPage() {
-  return <HabitsNavWrapper><DailyJournal appDate={null} /></HabitsNavWrapper>;
+  return (
+    <HabitsNavWrapper>
+      <DailyJournal appDate={null} />
+    </HabitsNavWrapper>
+  );
 }
 
 // --- Navigation Wrapper for Tabs ---
@@ -313,10 +326,30 @@ function HabitsNavWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <div className="flex justify-center gap-4 mb-6 mt-8">
-        <Link to="/habits" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Habits</Link>
-        <Link to="/timeblocks" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Time-blocks</Link>
-        <Link to="/analytics" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Analytics</Link>
-        <Link to="/journal" className="px-4 py-2 rounded-t-lg font-semibold transition-colors focus:outline-none bg-gray-200 text-gray-900 hover:bg-sky-200">Journal</Link>
+        <Link
+          to="/habits"
+          className="rounded-t-lg bg-gray-200 px-4 py-2 font-semibold text-gray-900 transition-colors focus:outline-none hover:bg-sky-200"
+        >
+          Habits
+        </Link>
+        <Link
+          to="/timeblocks"
+          className="rounded-t-lg bg-gray-200 px-4 py-2 font-semibold text-gray-900 transition-colors focus:outline-none hover:bg-sky-200"
+        >
+          Time-blocks
+        </Link>
+        <Link
+          to="/analytics"
+          className="rounded-t-lg bg-gray-200 px-4 py-2 font-semibold text-gray-900 transition-colors focus:outline-none hover:bg-sky-200"
+        >
+          Analytics
+        </Link>
+        <Link
+          to="/journal"
+          className="rounded-t-lg bg-gray-200 px-4 py-2 font-semibold text-gray-900 transition-colors focus:outline-none hover:bg-sky-200"
+        >
+          Journal
+        </Link>
       </div>
       {children}
     </div>
