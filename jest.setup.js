@@ -1,3 +1,5 @@
+import '@testing-library/jest-dom';
+
 // Jest setup file to mock window.matchMedia for jsdom
 if (typeof window !== 'undefined') {
   window.matchMedia =
